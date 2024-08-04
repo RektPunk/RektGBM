@@ -20,9 +20,8 @@ optuna = "^3.6.1"
 isort = "^5.13.2"
 black = "^24.8.0"
 pre-commit = "^3.8.0"
-mypy = "^1.11.1"
 ipykernel = "^6.29.5"
-pandas-stubs = "^2.2.2.240603"
+pytest = "^8.3.2"
 
 [build-system]
 requires = ["poetry-core"]

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Callable, Dict, Optional, Union
+from typing import Dict, Optional, Union
 
 import lightgbm as lgb
 import xgboost as xgb
@@ -7,28 +7,24 @@ import xgboost as xgb
 from rektgbm.base import (
     BaseEnum,
     DataFuncLike,
-    DtrainLike,
-    ModelName,
+    DataLike,
+    MethodName,
     XdataLike,
     YdataLike,
 )
 
 
 class TypeName(BaseEnum):
-    train_dtype: str = "train_dtype"
-    predict_dtype: str = "predict_dtype"
+    train_dtype: int = 1
+    predict_dtype: int = 2
 
 
-def _lgb_predict_dtype(data: XdataLike):
-    return data
-
-
-MODEL_FUNC_TYPE_MAPPER: Dict[ModelName, Dict[TypeName, DataFuncLike]] = {
-    ModelName.lightgbm: {
+MODEL_FUNC_TYPE_MAPPER: Dict[MethodName, Dict[TypeName, DataFuncLike]] = {
+    MethodName.lightgbm: {
         TypeName.train_dtype: lgb.Dataset,
-        TypeName.predict_dtype: _lgb_predict_dtype,
+        TypeName.predict_dtype: lambda data: data,
     },
-    ModelName.xgboost: {
+    MethodName.xgboost: {
         TypeName.train_dtype: xgb.DMatrix,
         TypeName.predict_dtype: xgb.DMatrix,
     },
@@ -38,34 +34,28 @@ MODEL_FUNC_TYPE_MAPPER: Dict[ModelName, Dict[TypeName, DataFuncLike]] = {
 @dataclass
 class RektDataset:
     data: XdataLike
-    label: Optional[YdataLike] = (None,)
-    model: str = (ModelName.lightgbm.value,)
+    label: Optional[YdataLike] = None
+    model: str = MethodName.lightgbm.value
 
     def __post_init__(self):
-        _model = ModelName.get(self.model)
+        _model = MethodName.get(self.model)
         _funcs = MODEL_FUNC_TYPE_MAPPER.get(_model)
-        self._train_dtype = _funcs.get(TypeName.train_dtype)
-        self._predict_dtype = _funcs.get(TypeName.predict_dtype)
+        self.train_dtype = _funcs.get(TypeName.train_dtype)
+        self.predict_dtype = _funcs.get(TypeName.predict_dtype)
         self._is_none_label = True if self.label is None else False
 
     @property
-    def train_dtype(self) -> Callable:
-        return self._train_dtype
-
-    @property
-    def predict_dtype(self) -> Callable:
-        return self._predict_dtype
-
-    @property
-    def dtrain(self) -> DtrainLike:
+    def dtrain(self) -> DataLike:
         self.__label_available()
-        return self._train_dtype(data=self._data, label=self._label)
+        return self.train_dtype(data=self.data, label=self.label)
 
     @property
-    def dpredict(self) -> Union[DtrainLike, Callable]:
-        return self._predict_dtype(data=self._data)
+    def dpredict(self) -> Union[DataLike, XdataLike]:
+        return self.predict_dtype(data=self.data)
 
     def __label_available(self) -> None:
         """Check if the label is available, raises an exception if not."""
         if getattr(self, "_is_none_label", False):
             raise AttributeError("Label is not available because it is set to None.")
+
+    # TODO: validation split logic for optimize

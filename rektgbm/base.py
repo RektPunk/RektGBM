@@ -10,7 +10,7 @@ import xgboost as xgb
 
 class BaseEnum(Enum):
     @classmethod
-    def get(cls, text: str) -> Enum:
+    def get(cls, text: str) -> "BaseEnum":
         cls.__check_valid(text)
         return cls[text]
 
@@ -33,14 +33,13 @@ class BaseGBM(ABC):
         pass
 
 
-class ModelName(BaseEnum):
+class MethodName(BaseEnum):
     lightgbm: str = "lightgbm"
     xgboost: str = "xgboost"
 
 
 XdataLike = Union[pd.DataFrame, pd.Series, np.ndarray]
 YdataLike = Union[pd.Series, np.ndarray]
-AlphaLike = Union[List[float], float]
 ModelLike = Union[lgb.basic.Booster, xgb.Booster]
-DtrainLike = Union[lgb.basic.Dataset, xgb.DMatrix]
-DataFuncLike = Callable[[XdataLike, Optional[YdataLike]], Union[XdataLike, DtrainLike]]
+DataLike = Union[lgb.basic.Dataset, xgb.DMatrix]
+DataFuncLike = Callable[[XdataLike, Optional[YdataLike]], Union[DataLike, XdataLike]]

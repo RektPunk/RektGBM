@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Union
 
 import pandas as pd
 from sklearn.utils.multiclass import type_of_target
@@ -48,10 +48,10 @@ def _check_target(data: pd.DataFrame, column: Union[str, List[str]]) -> List[str
 def check_task_type(
     data: pd.DataFrame, target: Union[str, List[str]], task_type: Optional[str]
 ) -> TaskType:
-    _target: List[str] = _check_target(target)
+    _target: List[str] = _check_target(data=data, column=target)
     _type_inferred: str = type_of_target(data[_target].values)
     _sklearn_task_type = SklearnTaskType.get(_type_inferred)
     _task_type = SKLEARN_TASK_TYPE_MAPPER.get(_sklearn_task_type)
-    if _task_type is None or _task_type != TaskType.get(task_type):
+    if _task_type != TaskType.get(task_type):
         raise ValueError("Unable to infer 'task_type'.")
     return _task_type
