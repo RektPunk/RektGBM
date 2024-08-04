@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "rektgbm"
+version = "0.0.0"
+description = ""
+authors = ["RektPunk <rektpunk@gmail.com>"]
+license = "LICENSE"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+numpy = "^2.0.1"
+pandas = "^2.2.2"
+scikit-learn = "^1.5.1"
+lightgbm = "^4.5.0"
+xgboost = "^2.1.1"
+optuna = "^3.6.1"
+
+
+[tool.poetry.group.dev.dependencies]
+isort = "^5.13.2"
+black = "^24.8.0"
+pre-commit = "^3.8.0"
+mypy = "^1.11.1"
+ipykernel = "^6.29.5"
+pandas-stubs = "^2.2.2.240603"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

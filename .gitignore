@@ -1,0 +1,9 @@
+.idea/
+.local/
+.cache/
+__pycache__/
+.DS_store
+.ipynb_checkpoints/
+.vscode/
+.pytest_cache/
+.mypy_cache
