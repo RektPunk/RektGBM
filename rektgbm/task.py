@@ -1,15 +1,15 @@
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional
 
-import pandas as pd
 from sklearn.utils.multiclass import type_of_target
 
-from rektgbm.base import BaseEnum
+from rektgbm.base import BaseEnum, YdataLike
 
 
 class TaskType(BaseEnum):
     regression: int = 1
     binary: int = 2
     multiclass: int = 3
+    rank: int = 4
 
 
 class SklearnTaskType(BaseEnum):
@@ -18,40 +18,28 @@ class SklearnTaskType(BaseEnum):
     multiclass: int = 3
 
 
-SKLEARN_TASK_TYPE_MAPPER: Dict[SklearnTaskType, TaskType] = {
-    SklearnTaskType.continuous: TaskType.regression,
-    SklearnTaskType.binary: TaskType.binary,
-    SklearnTaskType.multiclass: TaskType.multiclass,
+SKLEARN_TASK_TYPE_MAPPER: Dict[SklearnTaskType, List[TaskType]] = {
+    SklearnTaskType.continuous: [TaskType.regression],
+    SklearnTaskType.binary: [TaskType.binary],
+    SklearnTaskType.multiclass: [TaskType.multiclass, TaskType.rank],
 }
 
 
-def _convert_target_to_list(column: Union[str, List[str]]) -> List[str]:
-    if isinstance(column, list) and len(column) != 1:
-        raise ValueError(f"column must be str or list[str] of length 1")
-    _column: List[str] = [column] if isinstance(column, str) else column
-    return _column
-
-
-def _check_target_in_data(data: pd.DataFrame, column: Union[str, List[str]]) -> None:
-    _dcols = data.columns
-    _missing_cols = [col for col in column if col not in _dcols]
-    if _missing_cols:
-        raise ValueError(f"The target is missing")
-
-
-def _check_target(data: pd.DataFrame, column: Union[str, List[str]]) -> List[str]:
-    _column = _convert_target_to_list(column=column)
-    _check_target_in_data(data=data, column=column)
-    return _column
-
-
 def check_task_type(
-    data: pd.DataFrame, target: Union[str, List[str]], task_type: Optional[str]
+    target: YdataLike,
+    task_type: Optional[str] = None,
 ) -> TaskType:
-    _target: List[str] = _check_target(target)
-    _type_inferred: str = type_of_target(data[_target].values)
+    _type_inferred: str = type_of_target(target.values)
     _sklearn_task_type = SklearnTaskType.get(_type_inferred)
-    _task_type = SKLEARN_TASK_TYPE_MAPPER.get(_sklearn_task_type)
-    if _task_type is None or _task_type != TaskType.get(task_type):
-        raise ValueError("Unable to infer 'task_type'.")
+    _task_types = SKLEARN_TASK_TYPE_MAPPER.get(_sklearn_task_type)
+    if task_type is not None:
+        _user_defined_task_type = TaskType.get(task_type)
+        if _user_defined_task_type not in _task_types:
+            raise ValueError(
+                "The inferred 'task_type' does not match the provided one.'task_type'. "
+                f"Expected one of '{[_.value for _ in _task_types]}'."
+            )
+        _task_type = _user_defined_task_type
+    else:
+        _task_type = _task_types[0]
     return _task_type

@@ -1,69 +1,84 @@
 from dataclasses import dataclass
-from typing import Callable, Dict, Optional, Union
+from typing import Dict, Optional, Tuple, Union
 
 import lightgbm as lgb
 import xgboost as xgb
+from sklearn.model_selection import train_test_split
 
 from rektgbm.base import (
     BaseEnum,
     DataFuncLike,
-    DtrainLike,
-    ModelName,
+    DataLike,
+    MethodName,
     XdataLike,
     YdataLike,
 )
 
 
-class TypeName(BaseEnum):
-    train_dtype: str = "train_dtype"
-    predict_dtype: str = "predict_dtype"
+class _TypeName(BaseEnum):
+    train_dtype: int = 1
+    predict_dtype: int = 2
 
 
-def _lgb_predict_dtype(data: XdataLike):
-    return data
-
-
-MODEL_FUNC_TYPE_MAPPER: Dict[ModelName, Dict[TypeName, DataFuncLike]] = {
-    ModelName.lightgbm: {
-        TypeName.train_dtype: lgb.Dataset,
-        TypeName.predict_dtype: _lgb_predict_dtype,
+_METHOD_FUNC_TYPE_MAPPER: Dict[MethodName, Dict[_TypeName, DataFuncLike]] = {
+    MethodName.lightgbm: {
+        _TypeName.train_dtype: lgb.Dataset,
+        _TypeName.predict_dtype: lambda data: data,
     },
-    ModelName.xgboost: {
-        TypeName.train_dtype: xgb.DMatrix,
-        TypeName.predict_dtype: xgb.DMatrix,
+    MethodName.xgboost: {
+        _TypeName.train_dtype: xgb.DMatrix,
+        _TypeName.predict_dtype: xgb.DMatrix,
     },
 }
+
+
+def _get_dtype(method: MethodName, dtype: _TypeName):
+    _method = MethodName.get(method)
+    _funcs = _METHOD_FUNC_TYPE_MAPPER.get(_method)
+    return _funcs.get(dtype)
+
+
+def _train_valid_split(
+    data: XdataLike, label: YdataLike
+) -> Tuple[XdataLike, XdataLike, YdataLike, YdataLike]:
+    return train_test_split(data, label, test_size=0.2, random_state=42)
 
 
 @dataclass
 class RektDataset:
     data: XdataLike
-    label: Optional[YdataLike] = (None,)
-    model: str = (ModelName.lightgbm.value,)
+    label: Optional[YdataLike] = None
 
     def __post_init__(self):
-        _model = ModelName.get(self.model)
-        _funcs = MODEL_FUNC_TYPE_MAPPER.get(_model)
-        self._train_dtype = _funcs.get(TypeName.train_dtype)
-        self._predict_dtype = _funcs.get(TypeName.predict_dtype)
         self._is_none_label = True if self.label is None else False
 
-    @property
-    def train_dtype(self) -> Callable:
-        return self._train_dtype
-
-    @property
-    def predict_dtype(self) -> Callable:
-        return self._predict_dtype
-
-    @property
-    def dtrain(self) -> DtrainLike:
+    def dtrain(self, method: MethodName) -> DataLike:
         self.__label_available()
-        return self._train_dtype(data=self._data, label=self._label)
+        train_dtype = _get_dtype(
+            method=method,
+            dtype=_TypeName.train_dtype,
+        )
+        return train_dtype(data=self.data, label=self.label)
 
-    @property
-    def dpredict(self) -> Union[DtrainLike, Callable]:
-        return self._predict_dtype(data=self._data)
+    def dpredict(self, method: MethodName) -> Union[DataLike, XdataLike]:
+        predict_dtype = _get_dtype(
+            method=method,
+            dtype=_TypeName.train_dtype,
+        )
+        return predict_dtype(data=self.data)
+
+    def split(self, method: MethodName) -> Tuple[DataLike, DataLike]:
+        self.__label_available()
+        train_dtype = _get_dtype(
+            method=method,
+            dtype=_TypeName.train_dtype,
+        )
+        train_data, valid_data, train_label, valid_label = _train_valid_split(
+            data=self.data, label=self.label
+        )
+        dtrain = train_dtype(data=train_data, label=train_label)
+        dvalid = train_dtype(data=valid_data, label=valid_label)
+        return dtrain, dvalid
 
     def __label_available(self) -> None:
         """Check if the label is available, raises an exception if not."""
