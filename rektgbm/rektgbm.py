@@ -1,6 +1,6 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
-from rektgbm.base import BaseEnum, BaseGBM, MethodName
+from rektgbm.base import BaseGBM, MethodName
 from rektgbm.dataset import RektDataset
 from rektgbm.engine import RektEngine
 from rektgbm.metric import RektMetric
