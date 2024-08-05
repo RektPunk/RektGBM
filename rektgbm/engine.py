@@ -13,15 +13,15 @@ class RektEngine(BaseGBM):
         self,
         method: MethodName,
         params: Dict[str, Any],
-    ):
+    ) -> None:
         self.method = method
         self.params = params
 
     def fit(
         self,
         dataset: RektDataset,
-        valid_set: Optional[RektDataset] = None,
-    ):
+        valid_set: Optional[RektDataset],
+    ) -> None:
         if valid_set is None:
             dtrain, dvalid = dataset.split(method=self.method)
         else:
