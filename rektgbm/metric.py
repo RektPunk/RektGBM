@@ -1,4 +1,5 @@
-from typing import Dict, List
+from dataclasses import dataclass
+from typing import Dict, List, Optional
 
 from rektgbm.base import BaseEnum, MethodName
 from rektgbm.task import TaskType
@@ -29,7 +30,7 @@ class LgbMetricName(BaseEnum):
     multi_logloss: str = "multi_logloss"
 
 
-TASK_OBJECTIVE_MAPPER: Dict[TaskType, List[MetricName]] = {
+TASK_METRIC_MAPPER: Dict[TaskType, List[MetricName]] = {
     TaskType.regression: [MetricName.rmse],
     TaskType.binary: [MetricName.logloss],
     TaskType.multiclass: [MetricName.mlogloss],
@@ -41,9 +42,33 @@ TASK_OBJECTIVE_MAPPER: Dict[TaskType, List[MetricName]] = {
 # "rmse" -> "reg:squarederror", "rmse"
 # create common eval mapper
 
-METRIC_ENGINE_STR_MAPPER: Dict[MetricName, Dict[MethodName, str]] = {
+METRIC_ENGINE_MAPPER: Dict[MetricName, Dict[MethodName, str]] = {
     MetricName.rmse: {
         MethodName.lightgbm: LgbMetricName.rmse.value,
         MethodName.xgboost: XgbMetricName.rmse.value,
     }
 }
+
+
+@dataclass
+class RektMetric:
+    task_type: TaskType
+    metric: Optional[str]
+
+    def __post_init__(self) -> None:
+        if self.metric:
+            self.metric = MetricName.get(self.metric)
+            self.__validate_metric()
+        else:
+            _metrics = TASK_METRIC_MAPPER.get(self.task_type)
+            self.metric = _metrics[0]
+
+        self._metric_engine_mapper = METRIC_ENGINE_MAPPER.get(self.metric)
+
+    def get_metric(self, method: MethodName) -> str:
+        return self._metric_engine_mapper.get(method)
+
+    def __validate_metric(self) -> None:
+        metrics = TASK_METRIC_MAPPER.get(self.task_type)
+        if self.metric not in metrics:
+            raise ValueError("")

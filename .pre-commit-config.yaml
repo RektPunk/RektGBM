@@ -10,3 +10,8 @@ repos:
     rev: stable
     hooks:
     -   id: black
+-   repo: https://github.com/pycqa/isort
+    rev: 5.12.0  # Use the latest version of isort
+    hooks:
+    -   id: isort
+        args: ["--profile", "black"]

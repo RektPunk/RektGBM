@@ -6,16 +6,14 @@ import xgboost as xgb
 
 from rektgbm.base import BaseGBM, MethodName, RektException
 from rektgbm.dataset import RektDataset
-from rektgbm.metric import MetricName
-from rektgbm.objective import ObjectiveName
 
 
-class Engine(BaseGBM):
+class RektEngine(BaseGBM):
     def __init__(
         self,
         params: Dict[str, Any],
-        objective: ObjectiveName,
-        metric: MetricName,
+        objective: str,
+        metric: str,
         method: MethodName,
     ):
         self.params = params
@@ -30,9 +28,8 @@ class Engine(BaseGBM):
     ):
         params = self.params.update(
             {
-                # TODO: lgb, xgb objective mapper, metric mapper
                 "objective": self.objective,
-                "metric": self.metric,  # can be set
+                "metric": self.metric,
             }
         )
         if valid_set is None:

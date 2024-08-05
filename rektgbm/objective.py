@@ -1,4 +1,5 @@
-from typing import Dict, List
+from dataclasses import dataclass
+from typing import Dict, List, Optional
 
 from rektgbm.base import BaseEnum, MethodName
 from rektgbm.task import TaskType
@@ -38,9 +39,33 @@ TASK_OBJECTIVE_MAPPER: Dict[TaskType, List[ObjectiveName]] = {
 # create common objective mapper
 # "rmse" -> "reg:squarederror", "rmse"
 # create common eval mapper
-OBJECTIVE_ENGINE_STR_MAPPER: Dict[ObjectiveName, Dict[MethodName, str]] = {
+OBJECTIVE_ENGINE_MAPPER: Dict[ObjectiveName, Dict[MethodName, str]] = {
     ObjectiveName.rmse: {
         MethodName.lightgbm: LgbObjectiveName.regression.value,
         MethodName.xgboost: XgbObjectiveName.squarederror.value,
     }
 }
+
+
+@dataclass
+class RektObjective:
+    task_type: TaskType
+    objective: Optional[str]
+
+    def __post_init__(self) -> None:
+        if self.objective:
+            self.objective = ObjectiveName.get(self.objective)
+            self.__validate_objective()
+        else:
+            _objectives = TASK_OBJECTIVE_MAPPER.get(self.task_type)
+            self.objective = _objectives[0]
+
+        self._objective_engine_mapper = OBJECTIVE_ENGINE_MAPPER.get(self.objective)
+
+    def get_objective(self, method: MethodName) -> str:
+        return self._objective_engine_mapper.get(method)
+
+    def __validate_objective(self) -> None:
+        objectives = TASK_OBJECTIVE_MAPPER.get(self.task_type)
+        if self.objective not in objectives:
+            raise ValueError("")
