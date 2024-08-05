@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Callable, List, Optional, Union
+from typing import Callable, Optional, Union
 
 import lightgbm as lgb
 import numpy as np
@@ -16,8 +16,8 @@ class BaseEnum(Enum):
 
     @classmethod
     def __check_valid(cls, text: str) -> None:
-        if text not in cls._member_names_:
-            valid_members = ", ".join(cls._member_names_)
+        if text not in cls._member_map_.keys():
+            valid_members = ", ".join(list(cls._member_map_.keys()))
             raise ValueError(
                 f"Invalid value: '{text}'. Expected one of: {valid_members}."
             )
@@ -36,6 +36,8 @@ class BaseGBM(ABC):
 class MethodName(BaseEnum):
     lightgbm: str = "lightgbm"
     xgboost: str = "xgboost"
+    lgb: str = "lightgbm"
+    xgb: str = "xgboost"
 
 
 XdataLike = Union[pd.DataFrame, pd.Series, np.ndarray]
@@ -43,3 +45,7 @@ YdataLike = Union[pd.Series, np.ndarray]
 ModelLike = Union[lgb.basic.Booster, xgb.Booster]
 DataLike = Union[lgb.basic.Dataset, xgb.DMatrix]
 DataFuncLike = Callable[[XdataLike, Optional[YdataLike]], Union[DataLike, XdataLike]]
+
+
+class RektException(Exception):
+    pass

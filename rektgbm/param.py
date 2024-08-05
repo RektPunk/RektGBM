@@ -4,6 +4,7 @@ from optuna import Trial
 
 
 def get_lgb_params(trial: Trial) -> Dict[str, Union[float, int]]:
+    # https://lightgbm.readthedocs.io/en/latest/Parameters.html#learning-control-parameters
     return {
         "verbosity": -1,
         "learning_rate": trial.suggest_float("learning_rate", 1e-2, 1.0),
@@ -18,6 +19,7 @@ def get_lgb_params(trial: Trial) -> Dict[str, Union[float, int]]:
 
 
 def get_xgb_params(trial: Trial) -> Dict[str, Union[float, int]]:
+    # https://xgboost.readthedocs.io/en/stable/parameter.html#parameters-for-tree-booster
     return {
         "verbosity": 0,
         "learning_rate": trial.suggest_float("learning_rate", 1e-2, 1.0),
