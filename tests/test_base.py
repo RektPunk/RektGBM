@@ -9,7 +9,9 @@ from rektgbm.base import DataLike, MethodName, XdataLike, YdataLike
 
 def test_base_enum_get_valid():
     assert MethodName.get("lightgbm") == MethodName.lightgbm
+    assert MethodName.get("lgb") == MethodName.lightgbm
     assert MethodName.get("xgboost") == MethodName.xgboost
+    assert MethodName.get("xgb") == MethodName.xgboost
     with pytest.raises(ValueError):
         MethodName.get("invalid")
 

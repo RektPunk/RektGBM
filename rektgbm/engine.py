@@ -11,27 +11,17 @@ from rektgbm.dataset import RektDataset
 class RektEngine(BaseGBM):
     def __init__(
         self,
-        params: Dict[str, Any],
-        objective: str,
-        metric: str,
         method: MethodName,
+        params: Dict[str, Any],
     ):
-        self.params = params
-        self.objective = objective
-        self.metric = metric
         self.method = method
+        self.params = params
 
     def fit(
         self,
         dataset: RektDataset,
         valid_set: Optional[RektDataset] = None,
     ):
-        params = self.params.update(
-            {
-                "objective": self.objective,
-                "metric": self.metric,
-            }
-        )
         if valid_set is None:
             dtrain, dvalid = dataset.split(method=self.method)
         else:
@@ -41,14 +31,14 @@ class RektEngine(BaseGBM):
         if self.__is_lgb:
             self.model = lgb.train(
                 train_set=dtrain,
-                params=params,
+                params=self.params,
                 valid_sets=dvalid,
             )
         elif self.__is_xgb:
             self.model = xgb.train(
                 dtrain=dtrain,
                 verbose_eval=False,
-                params=params,
+                params=self.params,
                 evals=[(dvalid, "valid")],
             )
         self._fitted = True

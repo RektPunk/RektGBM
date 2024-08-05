@@ -9,6 +9,10 @@ from rektgbm.task import TaskType
 # 2. TASK_METRIC_MAPPER: [0]: default
 # 3. update objectives and metrics
 
+## TODO
+# create common eval mapper
+# "rmse" -> "reg:squarederror", "rmse"
+
 
 class MetricName(BaseEnum):
     rmse: int = 1
@@ -37,10 +41,10 @@ TASK_METRIC_MAPPER: Dict[TaskType, List[MetricName]] = {
 }
 
 
-## TODO
-# create common objective mapper
-# "rmse" -> "reg:squarederror", "rmse"
-# create common eval mapper
+METRIC_DICT_KEY_MAPPER: Dict[MethodName, str] = {
+    MethodName.lightgbm: "metric",
+    MethodName.xgboost: "eval_metric",
+}
 
 METRIC_ENGINE_MAPPER: Dict[MetricName, Dict[MethodName, str]] = {
     MetricName.rmse: {
@@ -65,10 +69,14 @@ class RektMetric:
 
         self._metric_engine_mapper = METRIC_ENGINE_MAPPER.get(self.metric)
 
-    def get_metric(self, method: MethodName) -> str:
-        return self._metric_engine_mapper.get(method)
+    def get_metric(self, method: MethodName) -> Dict[str, str]:
+        return {
+            METRIC_DICT_KEY_MAPPER.get(method): self._metric_engine_mapper.get(method)
+        }
 
     def __validate_metric(self) -> None:
         metrics = TASK_METRIC_MAPPER.get(self.task_type)
         if self.metric not in metrics:
-            raise ValueError("")
+            raise ValueError(
+                f"Task type '{self.task_type}' and metric '{self.metric}' are not matched."
+            )

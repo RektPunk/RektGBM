@@ -4,11 +4,17 @@ from typing import Dict, List, Optional
 from rektgbm.base import BaseEnum, MethodName
 from rektgbm.task import TaskType
 
-
 # TODO
 # 1. add alias
 # 2. TASK_OBJECTIVE_MAPPER: [0]: default
 # 3. update objectives and metrics
+
+## TODO
+# create common objective mapper
+# "rmse" -> "reg:squarederror", "rmse"
+OBJECTIVE_DICT_KEY: str = "objective"
+
+
 class ObjectiveName(BaseEnum):
     rmse: int = 1
     binary: int = 2
@@ -35,10 +41,7 @@ TASK_OBJECTIVE_MAPPER: Dict[TaskType, List[ObjectiveName]] = {
     TaskType.multiclass: [ObjectiveName.multiclass],
 }
 
-## TODO
-# create common objective mapper
-# "rmse" -> "reg:squarederror", "rmse"
-# create common eval mapper
+
 OBJECTIVE_ENGINE_MAPPER: Dict[ObjectiveName, Dict[MethodName, str]] = {
     ObjectiveName.rmse: {
         MethodName.lightgbm: LgbObjectiveName.regression.value,
@@ -62,10 +65,12 @@ class RektObjective:
 
         self._objective_engine_mapper = OBJECTIVE_ENGINE_MAPPER.get(self.objective)
 
-    def get_objective(self, method: MethodName) -> str:
-        return self._objective_engine_mapper.get(method)
+    def get_objective(self, method: MethodName) -> Dict[str, str]:
+        return {OBJECTIVE_DICT_KEY: self._objective_engine_mapper.get(method)}
 
     def __validate_objective(self) -> None:
         objectives = TASK_OBJECTIVE_MAPPER.get(self.task_type)
         if self.objective not in objectives:
-            raise ValueError("")
+            raise ValueError(
+                f"Task type '{self.task_type}' and objective '{self.objective}' are not matched."
+            )

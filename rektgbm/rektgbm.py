@@ -52,10 +52,9 @@ class RektGBM(BaseGBM):
         for method in self.methods:
             _objective = self.rekt_objective.get_objective(method=method)
             _metric = self.rekt_metric.get_metric(method=method)
+            _params = self.params.update({**_objective, **_metric})
             _engine = RektEngine(
-                params=self.params,
-                objective=_objective,
-                metric=_metric,
+                params=_params,
                 method=method,
             )
             _engine.fit(dataset=dataset, valid_set=valid_set)
