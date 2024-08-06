@@ -17,6 +17,7 @@ def get_lgb_params(trial: Trial) -> Dict[str, Union[float, int]]:
         "feature_fraction": trial.suggest_float("feature_fraction", 0.4, 1.0),
         "bagging_fraction": trial.suggest_float("bagging_fraction", 0.4, 1.0),
         "bagging_freq": trial.suggest_int("bagging_freq", 1, 7),
+        "n_estimators": trial.suggest_categorical("n_estimators", [7000, 15000, 20000]),
     }
 
 

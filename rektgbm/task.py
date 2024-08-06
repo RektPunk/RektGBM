@@ -27,7 +27,7 @@ SKLEARN_TASK_TYPE_MAPPER: Dict[SklearnTaskType, List[TaskType]] = {
 
 def check_task_type(
     target: YdataLike,
-    task_type: Optional[str] = None,
+    task_type: Optional[str],
 ) -> TaskType:
     _type_inferred: str = type_of_target(target.values)
     _sklearn_task_type = SklearnTaskType.get(_type_inferred)

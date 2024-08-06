@@ -15,9 +15,9 @@ from rektgbm.task import TaskType
 
 
 class MetricName(BaseEnum):
-    rmse: int = 1
-    logloss: int = 2
-    mlogloss: int = 3
+    rmse: str = "rmse"
+    logloss: str = "logloss"
+    mlogloss: str = "mlogloss"
 
 
 class XgbMetricName(BaseEnum):

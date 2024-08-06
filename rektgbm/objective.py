@@ -16,9 +16,9 @@ OBJECTIVE_DICT_KEY: str = "objective"
 
 
 class ObjectiveName(BaseEnum):
-    rmse: int = 1
-    binary: int = 2
-    multiclass: int = 3
+    rmse: str = "rmse"
+    binary: str = "binary"
+    multiclass: str = "multiclass"
 
 
 class XgbObjectiveName(BaseEnum):

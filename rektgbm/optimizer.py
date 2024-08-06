@@ -2,7 +2,7 @@ from typing import Any, Callable, Dict, List, Optional, Union
 
 import optuna
 
-from rektgbm.base import BaseEnum, MethodName, RektException
+from rektgbm.base import BaseEnum, MethodName, StateException
 from rektgbm.dataset import RektDataset
 from rektgbm.engine import RektEngine
 from rektgbm.metric import RektMetric
@@ -22,7 +22,7 @@ class _RektMethods(BaseEnum):
 class RektOptimizer:
     def __init__(
         self,
-        method: str,
+        method: str = "both",
         task_type: Optional[str] = None,
         objective: Optional[str] = None,
         metric: Optional[str] = None,
@@ -63,15 +63,10 @@ class RektOptimizer:
             task_type=self.task_type,
             metric=self.metric,
         )
-        if valid_set is None:
-            dtrain, dvalid, deval = dataset.split(method=self.method)
-        else:
-            dtrain = dataset.dtrain(method=self.method)
-            dvalid = valid_set.dtrain(method=self.method)
-            # deval = valid_set.dpredict(method=self.method) #FIXME
-
         self.studies: Dict[MethodName, optuna.Study] = {}
         for method, param in zip(self.method, self.params):
+            if valid_set is None:
+                dataset, valid_set = dataset.split()
 
             def _study_func(trial: optuna.Trial) -> float:
                 _param = param(trial=trial)
@@ -83,13 +78,11 @@ class RektOptimizer:
                     params=_param,
                     method=method,
                 )
-                _engine.fit(dataset=dtrain, valid_set=dvalid)
-                # _preds = _engine.predict(dataset=deval)
-                # loss = lossfunction(y_pred=_preds, dtrain=dvalid) #FIXME
-                return 1  # FIXME
+                _engine.fit(dataset=dataset, valid_set=valid_set)
+                return _engine.eval_loss
 
             study = optuna.create_study(
-                study_name=f"Rekt_{method}",
+                study_name=f"Rekt_{method.value}",
                 direction="minimize",
                 load_if_exists=True,
             )
@@ -106,11 +99,11 @@ class RektOptimizer:
             "method": best_method.value,
             "params": best_study.best_params,
             "task_type": self.task_type.value,
-            "objective": self.rekt_objective.get_objective_str(method=best_method),
-            "metric": self.rekt_metric.get_metric_str(method=best_method),
+            "objective": self.rekt_objective.objective.value,
+            "metric": self.rekt_metric.metric.value,
         }
 
     def __check_optimized(self) -> None:
         """Check if the optimization process has been completed."""
         if not getattr(self, "_is_optimized", False):
-            raise RektException("Optimization is not completed.")
+            raise StateException("Optimization is not completed.")

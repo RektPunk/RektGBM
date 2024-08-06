@@ -33,7 +33,8 @@ class RektGBM(BaseGBM):
             task_type=self.task_type,
         )
         self.rekt_objective = RektObjective(
-            task_type=self.task_type, objective=self.objective
+            task_type=self.task_type,
+            objective=self.objective,
         )
         self.rekt_metric = RektMetric(
             task_type=self.task_type,
@@ -42,9 +43,9 @@ class RektGBM(BaseGBM):
 
         _objective = self.rekt_objective.get_objective(method=self.method)
         _metric = self.rekt_metric.get_metric(method=self.method)
-        _params = self.params.update({**_objective, **_metric})
+        self.params.update({**_objective, **_metric})
         self.engine = RektEngine(
-            params=_params,
+            params=self.params,
             method=self.method,
         )
         self.engine.fit(dataset=dataset, valid_set=valid_set)
