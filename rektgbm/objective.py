@@ -23,16 +23,42 @@ class ObjectiveName(BaseEnum):
 
 class XgbObjectiveName(BaseEnum):
     # https://xgboost.readthedocs.io/en/stable/parameter.html#learning-task-parameters
-    squarederror: str = "reg:squarederror"
-    logistic: str = "binary:logistic"
-    softmax: str = "multi:softmax"
+    squarederror: str = "reg:squarederror"  # regression with squared loss.
+    squaredlogerror: str = "reg:squaredlogerror"  # regression with squared log loss.
+    pseudohubererror: str = "reg:pseudohubererror"  # regression with Pseudo Huber loss.
+    logistic: str = "binary:logistic"  # logistic regression for binary classification, output probability.
+    logitraw: str = "binary:logitraw"  # logistic regression for binary classification, output score before logistic transformation.
+    hinge: str = "binary:hinge"  # hinge loss for binary classification. This makes predictions of 0 or 1, rather than producing probabilities.
+    poisson: str = "count:poisson"  # Poisson regression for count data, output mean of Poisson distribution.
+    cox: str = "survival:cox"  #: Cox proportional hazards model for survival analysis.
+    aft: str = "survival:aft"  #: Accelerated Failure Time model for survival analysis.
+    softmax: str = "multi:softmax"  #: set XGBoost to do multiclass classification using the softmax objective, output a class number.
+    softprob: str = "multi:softprob"  #: same as softmax, but output a vector of ndata * nclass, which can be further reshaped to ndata, nclass matrix. The result contains predicted probability of each data point belonging to each class.
+    pairwise: str = "rank:pairwise"  #: set XGBoost to do ranking task by minimizing the pairwise loss.
+    ndcg: str = "rank:ndcg"  #: set XGBoost to do ranking task by minimizing the normalized discounted cumulative gain (NDCG) loss.
+    map_: str = "rank:map"  #: set XGBoost to do ranking task by minimizing the mean average precision (MAP) loss.
+    gamma: str = "reg:gamma"  #: gamma regression with log-link. Output is a mean of gamma distribution.
+    tweedie: str = "reg:tweedie"  #: Tweedie regression with log-link. Output is a mean of Tweedie distribution.
 
 
 class LgbObjectiveName(BaseEnum):
     # https://lightgbm.readthedocs.io/en/latest/Parameters.html#core-parameters
     regression: str = "regression"
+    regression_l1: str = "regression_l1"
+    huber: str = "huber"
+    fair: str = "fair"
+    poisson: str = "poisson"
+    quantile: str = "quantile"
+    mape: str = "mape"
+    gamma: str = "gamma"
+    tweedie: str = "tweedie"
     binary: str = "binary"
     multiclass: str = "multiclass"
+    multiclassova: str = "multiclassova"
+    cross_entropy: str = "cross_entropy"
+    cross_entropy_lambda: str = "cross_entropy_lambda"
+    lambdarank: str = "lambdarank"
+    rank_xendcg: str = "rank_xendcg"
 
 
 TASK_OBJECTIVE_MAPPER: Dict[TaskType, List[ObjectiveName]] = {
