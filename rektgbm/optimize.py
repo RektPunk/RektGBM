@@ -28,7 +28,6 @@ class RektOptimizer:
         metric: Optional[str] = None,
         params: Optional[Union[List[Callable], Callable]] = None,
     ) -> None:
-        """Initialize the MQOptimizer."""
         if _RektMethods.both == _RektMethods.get(method):
             self.method = [MethodName.lightgbm, MethodName.xgboost]
         else:
