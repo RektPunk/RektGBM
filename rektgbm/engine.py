@@ -23,7 +23,7 @@ class RektEngine(BaseGBM):
         valid_set: Optional[RektDataset],
     ) -> None:
         if valid_set is None:
-            dtrain, dvalid = dataset.split(method=self.method)
+            dtrain, dvalid, _ = dataset.split(method=self.method)
         else:
             dtrain = dataset.dtrain(method=self.method)
             dvalid = valid_set.dtrain(method=self.method)
@@ -47,11 +47,11 @@ class RektEngine(BaseGBM):
         self,
         dataset: RektDataset,
     ) -> np.ndarray:
-        self.__predict_available()
+        self.__check_predict_available()
         _pred = self.model.predict(data=dataset.dpredict(method=self.method))
         return _pred
 
-    def __predict_available(self) -> None:
+    def __check_predict_available(self) -> None:
         if not getattr(self, "_fitted", False):
             raise RektException("Fit must be executed before predict")
 

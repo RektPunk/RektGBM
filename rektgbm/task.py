@@ -6,10 +6,10 @@ from rektgbm.base import BaseEnum, YdataLike
 
 
 class TaskType(BaseEnum):
-    regression: int = 1
-    binary: int = 2
-    multiclass: int = 3
-    rank: int = 4
+    regression: str = "regression"
+    binary: str = "binary"
+    multiclass: str = "multiclass"
+    rank: str = "rank"
 
 
 class SklearnTaskType(BaseEnum):

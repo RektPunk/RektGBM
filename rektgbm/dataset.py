@@ -67,18 +67,24 @@ class RektDataset:
         )
         return predict_dtype(data=self.data)
 
-    def split(self, method: MethodName) -> Tuple[DataLike, DataLike]:
+    def split(self, method: MethodName) -> Tuple[DataLike, DataLike, DataLike]:
         self.__label_available()
         train_dtype = _get_dtype(
             method=method,
             dtype=_TypeName.train_dtype,
         )
+        predict_dtype = _get_dtype(
+            method=method,
+            dtype=_TypeName.predict_dtype,
+        )
+
         train_data, valid_data, train_label, valid_label = _train_valid_split(
             data=self.data, label=self.label
         )
         dtrain = train_dtype(data=train_data, label=train_label)
         dvalid = train_dtype(data=valid_data, label=valid_label)
-        return dtrain, dvalid
+        deval = predict_dtype(data=valid_data)
+        return dtrain, dvalid, deval
 
     def __label_available(self) -> None:
         """Check if the label is available, raises an exception if not."""

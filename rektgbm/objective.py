@@ -65,8 +65,11 @@ class RektObjective:
 
         self._objective_engine_mapper = OBJECTIVE_ENGINE_MAPPER.get(self.objective)
 
+    def get_objective_str(self, method: MethodName) -> str:
+        return self._objective_engine_mapper.get(method)
+
     def get_objective(self, method: MethodName) -> Dict[str, str]:
-        return {OBJECTIVE_DICT_KEY: self._objective_engine_mapper.get(method)}
+        return {OBJECTIVE_DICT_KEY: self.get_objective_str(method=method)}
 
     def __validate_objective(self) -> None:
         objectives = TASK_OBJECTIVE_MAPPER.get(self.task_type)

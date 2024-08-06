@@ -69,10 +69,11 @@ class RektMetric:
 
         self._metric_engine_mapper = METRIC_ENGINE_MAPPER.get(self.metric)
 
+    def get_metric_str(self, method: MethodName) -> str:
+        return self._metric_engine_mapper.get(method)
+
     def get_metric(self, method: MethodName) -> Dict[str, str]:
-        return {
-            METRIC_DICT_KEY_MAPPER.get(method): self._metric_engine_mapper.get(method)
-        }
+        return {METRIC_DICT_KEY_MAPPER.get(method): self.get_metric_str(method=method)}
 
     def __validate_metric(self) -> None:
         metrics = TASK_METRIC_MAPPER.get(self.task_type)
