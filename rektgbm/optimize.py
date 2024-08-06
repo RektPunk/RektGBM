@@ -69,7 +69,7 @@ class RektOptimizer:
         else:
             dtrain = dataset.dtrain(method=self.method)
             dvalid = valid_set.dtrain(method=self.method)
-            deval = valid_set.dpredict(method=self.method)
+            # deval = valid_set.dpredict(method=self.method) #FIXME
 
         self.studies: Dict[MethodName, optuna.Study] = {}
         for method, param in zip(self.method, self.params):
