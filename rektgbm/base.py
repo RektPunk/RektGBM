@@ -47,5 +47,5 @@ DataLike = Union[lgb.basic.Dataset, xgb.DMatrix]
 DataFuncLike = Callable[[XdataLike, Optional[YdataLike]], Union[DataLike, XdataLike]]
 
 
-class RektException(Exception):
+class StateException(Exception):
     pass

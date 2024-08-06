@@ -2,6 +2,8 @@ from typing import Dict, Union
 
 from optuna import Trial
 
+from rektgbm.base import MethodName
+
 
 def get_lgb_params(trial: Trial) -> Dict[str, Union[float, int]]:
     # https://lightgbm.readthedocs.io/en/latest/Parameters.html#learning-control-parameters
@@ -15,6 +17,7 @@ def get_lgb_params(trial: Trial) -> Dict[str, Union[float, int]]:
         "feature_fraction": trial.suggest_float("feature_fraction", 0.4, 1.0),
         "bagging_fraction": trial.suggest_float("bagging_fraction", 0.4, 1.0),
         "bagging_freq": trial.suggest_int("bagging_freq", 1, 7),
+        "n_estimators": trial.suggest_categorical("n_estimators", [7000, 15000, 20000]),
     }
 
 
@@ -30,3 +33,9 @@ def get_xgb_params(trial: Trial) -> Dict[str, Union[float, int]]:
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.1, 1.0),
         "n_estimators": trial.suggest_categorical("n_estimators", [7000, 15000, 20000]),
     }
+
+
+METHOD_PARAMS_MAPPER = {
+    MethodName.lightgbm: get_lgb_params,
+    MethodName.xgboost: get_xgb_params,
+}
