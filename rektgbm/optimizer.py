@@ -61,6 +61,7 @@ class RektOptimizer:
         )
         self.rekt_metric = RektMetric(
             task_type=self.task_type,
+            objective=self.rekt_objective.objective,
             metric=self.metric,
         )
         self.studies: Dict[MethodName, optuna.Study] = {}
