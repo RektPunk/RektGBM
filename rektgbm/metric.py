@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional
 
 from rektgbm.base import BaseEnum, MethodName
+from rektgbm.objective import ObjectiveName
 from rektgbm.task import TaskType
 
 
@@ -14,6 +15,7 @@ class MetricName(BaseEnum):
     gamma_deviance: str = "gamma_deviance"
     poisson: str = "poisson"
     tweedie: str = "tweedie"
+    quantile: str = "quantile"
     logloss: str = "logloss"
     auc: str = "auc"
     mlogloss: str = "mlogloss"
@@ -84,6 +86,7 @@ TASK_METRIC_MAPPER: Dict[TaskType, List[MetricName]] = {
         MetricName.gamma,
         MetricName.gamma_deviance,
         MetricName.poisson,
+        MetricName.quantile,
         MetricName.tweedie,
     ],
     TaskType.binary: [
@@ -97,6 +100,21 @@ TASK_METRIC_MAPPER: Dict[TaskType, List[MetricName]] = {
         MetricName.ndcg,
         MetricName.map,
     ],
+}
+
+
+OBJECTIVE_METRIC_MAPPER: Dict[ObjectiveName, MetricName] = {
+    ObjectiveName.rmse: MetricName.rmse,
+    ObjectiveName.mae: MetricName.mae,
+    ObjectiveName.huber: MetricName.mae,
+    ObjectiveName.poisson: MetricName.poisson,
+    ObjectiveName.quantile: MetricName.quantile,
+    ObjectiveName.gamma: MetricName.gamma,
+    ObjectiveName.tweedie: MetricName.tweedie,
+    ObjectiveName.binary: MetricName.logloss,
+    ObjectiveName.multiclass: MetricName.mlogloss,
+    ObjectiveName.lambdarank: MetricName.ndcg,
+    ObjectiveName.ndcg: MetricName.map,
 }
 
 
@@ -146,6 +164,10 @@ METRIC_ENGINE_MAPPER: Dict[MetricName, Dict[MethodName, str]] = {
         MethodName.lightgbm: LgbMetricName.tweedie.value,
         MethodName.xgboost: XgbMetricName.tweedie_nloglik.value,
     },
+    MetricName.quantile: {
+        MethodName.lightgbm: LgbMetricName.quantile.value,
+        MethodName.xgboost: None,
+    },
     MetricName.ndcg: {
         MethodName.lightgbm: LgbMetricName.ndcg.value,
         MethodName.xgboost: XgbMetricName.ndcg.value,
@@ -160,6 +182,7 @@ METRIC_ENGINE_MAPPER: Dict[MetricName, Dict[MethodName, str]] = {
 @dataclass
 class RektMetric:
     task_type: TaskType
+    objective: ObjectiveName
     metric: Optional[str]
 
     def __post_init__(self) -> None:
@@ -167,8 +190,7 @@ class RektMetric:
             self.metric = MetricName.get(self.metric)
             self.__validate_metric()
         else:
-            _metrics = TASK_METRIC_MAPPER.get(self.task_type)
-            self.metric = _metrics[0]
+            self.metric = OBJECTIVE_METRIC_MAPPER.get(self.objective)
 
         self._metric_engine_mapper = METRIC_ENGINE_MAPPER.get(self.metric)
 
