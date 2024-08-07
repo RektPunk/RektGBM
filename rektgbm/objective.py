@@ -38,7 +38,6 @@ class XgbObjectiveName(BaseEnum):
     pairwise: str = "rank:pairwise"
     ndcg: str = "rank:ndcg"
     map: str = "rank:map"
-    pairwise: str = "rank:pairwise"
     gamma: str = "reg:gamma"
     tweedie: str = "reg:tweedie"
 
