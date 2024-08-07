@@ -58,7 +58,8 @@ class RektOptimizer:
             task_type=self._task_type,
         )
         self.rekt_objective = RektObjective(
-            task_type=self.task_type, objective=self.objective
+            task_type=self.task_type,
+            objective=self.objective,
         )
         self.rekt_metric = RektMetric(
             task_type=self.task_type,

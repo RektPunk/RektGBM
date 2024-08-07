@@ -11,10 +11,8 @@ class ObjectiveName(BaseEnum):
     rmse: str = "rmse"
     mae: str = "mae"
     huber: str = "huber"
-    poisson: str = "poisson"
     quantile: str = "quantile"
     gamma: str = "gamma"
-    tweedie: str = "tweedie"
     binary: str = "binary"
     multiclass: str = "multiclass"
     lambdarank: str = "lambdarank"
@@ -66,10 +64,8 @@ TASK_OBJECTIVE_MAPPER: Dict[TaskType, List[ObjectiveName]] = {
         ObjectiveName.rmse,
         ObjectiveName.mae,
         ObjectiveName.huber,
-        ObjectiveName.poisson,
         ObjectiveName.quantile,
         ObjectiveName.gamma,
-        ObjectiveName.tweedie,
     ],
     TaskType.binary: [
         ObjectiveName.binary,
@@ -97,10 +93,6 @@ OBJECTIVE_ENGINE_MAPPER: Dict[ObjectiveName, Dict[MethodName, str]] = {
         MethodName.lightgbm: LgbObjectiveName.huber.value,
         MethodName.xgboost: XgbObjectiveName.pseudohubererror.value,
     },
-    ObjectiveName.poisson: {
-        MethodName.lightgbm: LgbObjectiveName.poisson.value,
-        MethodName.xgboost: XgbObjectiveName.poisson.value,
-    },
     ObjectiveName.quantile: {
         MethodName.lightgbm: LgbObjectiveName.quantile.value,
         MethodName.xgboost: XgbObjectiveName.quantileerror.value,
@@ -108,10 +100,6 @@ OBJECTIVE_ENGINE_MAPPER: Dict[ObjectiveName, Dict[MethodName, str]] = {
     ObjectiveName.gamma: {
         MethodName.lightgbm: LgbObjectiveName.gamma.value,
         MethodName.xgboost: XgbObjectiveName.gamma.value,
-    },
-    ObjectiveName.tweedie: {
-        MethodName.lightgbm: LgbObjectiveName.tweedie.value,
-        MethodName.xgboost: XgbObjectiveName.tweedie.value,
     },
     ObjectiveName.binary: {
         MethodName.lightgbm: LgbObjectiveName.binary.value,
