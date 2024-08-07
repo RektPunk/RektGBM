@@ -18,7 +18,5 @@ rekt_optimizer.optimize_params(
 print(rekt_optimizer.best_params)
 
 rekt_gbm = RektGBM(**rekt_optimizer.best_params)
-rekt_gbm.fit(
-    dataset=dtrain,
-)
+rekt_gbm.fit(dataset=dtrain)
 preds = rekt_gbm.predict(dataset=dtest)
