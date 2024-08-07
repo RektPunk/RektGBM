@@ -8,48 +8,20 @@ OBJECTIVE_DICT_KEY: str = "objective"
 
 
 class ObjectiveName(BaseEnum):
-    # lgb
     rmse: str = "rmse"
     mae: str = "mae"
     huber: str = "huber"
-    fair: str = "fair"
     poisson: str = "poisson"
     quantile: str = "quantile"
-    mape: str = "mape"
     gamma: str = "gamma"
     tweedie: str = "tweedie"
     binary: str = "binary"
     multiclass: str = "multiclass"
-    multiclassova: str = "multiclassova"
-    cross_entropy: str = "cross_entropy"
-    cross_entropy_lambda: str = "cross_entropy_lambda"
     lambdarank: str = "lambdarank"
-    rank_xendcg: str = "rank_xendcg"
-
-    # xgb
-    squarederror: str = "reg:squarederror"
-    squaredlogerror: str = "reg:squaredlogerror"
-    pseudohubererror: str = "reg:pseudohubererror"
-    absoluteerror: str = "reg:reg:absoluteerror"
-    quantileerror: str = "reg:quantileerror"
-    logistic: str = "binary:logistic"
-    logitraw: str = "binary:logitraw"
-    hinge: str = "binary:hinge"
-    poisson: str = "count:poisson"
-    cox: str = "survival:cox"
-    aft: str = "survival:aft"
-    softmax: str = "multi:softmax"
-    softprob: str = "multi:softprob"
-    pairwise: str = "rank:pairwise"
-    ndcg: str = "rank:ndcg"
-    map: str = "rank:map"
-    pairwise: str = "rank:pairwise"
-    gamma: str = "reg:gamma"
-    tweedie: str = "reg:tweedie"
+    ndcg: str = "ndcg"
 
 
 class XgbObjectiveName(BaseEnum):
-    # https://xgboost.readthedocs.io/en/stable/parameter.html#learning-task-parameters
     squarederror: str = "reg:squarederror"
     squaredlogerror: str = "reg:squaredlogerror"
     pseudohubererror: str = "reg:pseudohubererror"
@@ -72,7 +44,6 @@ class XgbObjectiveName(BaseEnum):
 
 
 class LgbObjectiveName(BaseEnum):
-    # https://lightgbm.readthedocs.io/en/latest/Parameters.html#core-parameters
     rmse: str = "rmse"
     mae: str = "mae"
     huber: str = "huber"
@@ -96,36 +67,20 @@ TASK_OBJECTIVE_MAPPER: Dict[TaskType, List[ObjectiveName]] = {
         ObjectiveName.rmse,
         ObjectiveName.mae,
         ObjectiveName.huber,
-        ObjectiveName.fair,
         ObjectiveName.poisson,
         ObjectiveName.quantile,
-        ObjectiveName.mape,
         ObjectiveName.gamma,
         ObjectiveName.tweedie,
-        ObjectiveName.squarederror,
-        ObjectiveName.squaredlogerror,
-        ObjectiveName.pseudohubererror,
     ],
     TaskType.binary: [
         ObjectiveName.binary,
-        ObjectiveName.logistic,
-        ObjectiveName.logitraw,
-        ObjectiveName.hinge,
-        ObjectiveName.cross_entropy,
-        ObjectiveName.cross_entropy_lambda,
     ],
     TaskType.multiclass: [
         ObjectiveName.multiclass,
-        ObjectiveName.multiclassova,
-        ObjectiveName.softmax,
-        ObjectiveName.softprob,
     ],
     TaskType.rank: [
         ObjectiveName.lambdarank,
-        ObjectiveName.rank_xendcg,
-        ObjectiveName.pairwise,
         ObjectiveName.ndcg,
-        ObjectiveName.map,
     ],
 }
 
@@ -137,15 +92,11 @@ OBJECTIVE_ENGINE_MAPPER: Dict[ObjectiveName, Dict[MethodName, str]] = {
     },
     ObjectiveName.mae: {
         MethodName.lightgbm: LgbObjectiveName.mae.value,
-        MethodName.xgboost: None,  # XGBoost does not have a direct equivalent
+        MethodName.xgboost: XgbObjectiveName.absoluteerror.value,
     },
     ObjectiveName.huber: {
         MethodName.lightgbm: LgbObjectiveName.huber.value,
-        MethodName.xgboost: None,  # XGBoost does not have a direct equivalent
-    },
-    ObjectiveName.fair: {
-        MethodName.lightgbm: LgbObjectiveName.fair.value,
-        MethodName.xgboost: None,  # XGBoost does not have a direct equivalent
+        MethodName.xgboost: XgbObjectiveName.pseudohubererror.value,
     },
     ObjectiveName.poisson: {
         MethodName.lightgbm: LgbObjectiveName.poisson.value,
@@ -153,11 +104,7 @@ OBJECTIVE_ENGINE_MAPPER: Dict[ObjectiveName, Dict[MethodName, str]] = {
     },
     ObjectiveName.quantile: {
         MethodName.lightgbm: LgbObjectiveName.quantile.value,
-        MethodName.xgboost: None,  # XGBoost does not have a direct equivalent
-    },
-    ObjectiveName.mape: {
-        MethodName.lightgbm: LgbObjectiveName.mape.value,
-        MethodName.xgboost: None,  # XGBoost does not have a direct equivalent
+        MethodName.xgboost: XgbObjectiveName.quantileerror.value,
     },
     ObjectiveName.gamma: {
         MethodName.lightgbm: LgbObjectiveName.gamma.value,
@@ -175,77 +122,13 @@ OBJECTIVE_ENGINE_MAPPER: Dict[ObjectiveName, Dict[MethodName, str]] = {
         MethodName.lightgbm: LgbObjectiveName.multiclass.value,
         MethodName.xgboost: XgbObjectiveName.softmax.value,
     },
-    ObjectiveName.multiclassova: {
-        MethodName.lightgbm: LgbObjectiveName.multiclassova.value,
-        MethodName.xgboost: None,  # XGBoost does not have a direct equivalent
-    },
-    ObjectiveName.cross_entropy: {
-        MethodName.lightgbm: LgbObjectiveName.cross_entropy.value,
-        MethodName.xgboost: None,  # XGBoost does not have a direct equivalent
-    },
-    ObjectiveName.cross_entropy_lambda: {
-        MethodName.lightgbm: LgbObjectiveName.cross_entropy_lambda.value,
-        MethodName.xgboost: None,  # XGBoost does not have a direct equivalent
-    },
     ObjectiveName.lambdarank: {
         MethodName.lightgbm: LgbObjectiveName.lambdarank.value,
         MethodName.xgboost: XgbObjectiveName.pairwise.value,
     },
-    ObjectiveName.rank_xendcg: {
+    ObjectiveName.ndcg: {
         MethodName.lightgbm: LgbObjectiveName.rank_xendcg.value,
         MethodName.xgboost: XgbObjectiveName.ndcg.value,
-    },
-    ObjectiveName.squarederror: {
-        MethodName.lightgbm: None,  # LightGBM does not have a direct equivalent
-        MethodName.xgboost: XgbObjectiveName.squarederror.value,
-    },
-    ObjectiveName.squaredlogerror: {
-        MethodName.lightgbm: None,  # LightGBM does not have a direct equivalent
-        MethodName.xgboost: XgbObjectiveName.squaredlogerror.value,
-    },
-    ObjectiveName.pseudohubererror: {
-        MethodName.lightgbm: None,  # LightGBM does not have a direct equivalent
-        MethodName.xgboost: XgbObjectiveName.pseudohubererror.value,
-    },
-    ObjectiveName.logistic: {
-        MethodName.lightgbm: None,  # LightGBM does not have a direct equivalent
-        MethodName.xgboost: XgbObjectiveName.logistic.value,
-    },
-    ObjectiveName.logitraw: {
-        MethodName.lightgbm: None,  # LightGBM does not have a direct equivalent
-        MethodName.xgboost: XgbObjectiveName.logitraw.value,
-    },
-    ObjectiveName.hinge: {
-        MethodName.lightgbm: None,  # LightGBM does not have a direct equivalent
-        MethodName.xgboost: XgbObjectiveName.hinge.value,
-    },
-    ObjectiveName.cox: {
-        MethodName.lightgbm: None,  # LightGBM does not have a direct equivalent
-        MethodName.xgboost: XgbObjectiveName.cox.value,
-    },
-    ObjectiveName.aft: {
-        MethodName.lightgbm: None,  # LightGBM does not have a direct equivalent
-        MethodName.xgboost: XgbObjectiveName.aft.value,
-    },
-    ObjectiveName.softmax: {
-        MethodName.lightgbm: None,  # LightGBM does not have a direct equivalent
-        MethodName.xgboost: XgbObjectiveName.softmax.value,
-    },
-    ObjectiveName.softprob: {
-        MethodName.lightgbm: None,  # LightGBM does not have a direct equivalent
-        MethodName.xgboost: XgbObjectiveName.softprob.value,
-    },
-    ObjectiveName.pairwise: {
-        MethodName.lightgbm: None,  # LightGBM does not have a direct equivalent
-        MethodName.xgboost: XgbObjectiveName.pairwise.value,
-    },
-    ObjectiveName.ndcg: {
-        MethodName.lightgbm: None,  # LightGBM does not have a direct equivalent
-        MethodName.xgboost: XgbObjectiveName.ndcg.value,
-    },
-    ObjectiveName.map: {
-        MethodName.lightgbm: None,  # LightGBM does not have a direct equivalent
-        MethodName.xgboost: XgbObjectiveName.map.value,
     },
 }
 
