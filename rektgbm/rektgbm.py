@@ -1,11 +1,13 @@
 from typing import Any, Dict, Optional
 
+import numpy as np
+
 from rektgbm.base import BaseGBM, MethodName
 from rektgbm.dataset import RektDataset
 from rektgbm.engine import RektEngine
 from rektgbm.metric import RektMetric
 from rektgbm.objective import RektObjective
-from rektgbm.task import check_task_type
+from rektgbm.task import TaskType, check_task_type
 
 
 class RektGBM(BaseGBM):
@@ -52,4 +54,10 @@ class RektGBM(BaseGBM):
         self.engine.fit(dataset=dataset, valid_set=valid_set)
 
     def predict(self, dataset: RektDataset):
-        return self.engine.predict(dataset=dataset)
+        preds = self.engine.predict(dataset=dataset)
+        if (
+            self._task_type == TaskType.multiclass
+            and self.method == MethodName.lightgbm
+        ):
+            return np.argmax(preds, axis=1)
+        return preds

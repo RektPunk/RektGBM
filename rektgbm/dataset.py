@@ -54,7 +54,7 @@ class RektDataset:
         self._is_none_label = True if self.label is None else False
 
     def dtrain(self, method: MethodName) -> DataLike:
-        self.__label_available()
+        self.__check_label_available()
         train_dtype = _get_dtype(
             method=method,
             dtype=_TypeName.train_dtype,
@@ -69,7 +69,7 @@ class RektDataset:
         return predict_dtype(data=self.data)
 
     def split(self) -> Tuple["RektDataset", "RektDataset"]:
-        self.__label_available()
+        self.__check_label_available()
         train_data, valid_data, train_label, valid_label = _train_valid_split(
             data=self.data, label=self.label
         )
@@ -78,7 +78,7 @@ class RektDataset:
         return dtrain, dvalid
 
     def dsplit(self, method: MethodName) -> Tuple[DataLike, DataLike]:
-        self.__label_available()
+        self.__check_label_available()
         train_data, valid_data, train_label, valid_label = _train_valid_split(
             data=self.data, label=self.label
         )
@@ -90,7 +90,11 @@ class RektDataset:
         dvalid = train_dtype(data=valid_data, label=valid_label)
         return dtrain, dvalid
 
-    def __label_available(self) -> None:
+    @property
+    def n_label(self) -> int:
+        return int(self.label.nunique())
+
+    def __check_label_available(self) -> None:
         """Check if the label is available, raises an exception if not."""
         if getattr(self, "_is_none_label", False):
             raise AttributeError("Label is not available because it is set to None.")

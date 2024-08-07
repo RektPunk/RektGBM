@@ -2,13 +2,12 @@ from typing import Any, Callable, Dict, List, Optional, Union
 
 import optuna
 
-from rektgbm.addparams import set_additional_params
 from rektgbm.base import BaseEnum, MethodName, StateException
 from rektgbm.dataset import RektDataset
 from rektgbm.engine import RektEngine
 from rektgbm.metric import RektMetric
-from rektgbm.objective import RektObjective
-from rektgbm.param import METHOD_PARAMS_MAPPER
+from rektgbm.objective import ObjectiveName, RektObjective
+from rektgbm.param import METHOD_PARAMS_MAPPER, set_additional_params
 from rektgbm.task import check_task_type
 
 
@@ -66,6 +65,12 @@ class RektOptimizer:
             objective=self.rekt_objective.objective,
             metric=self.metric,
         )
+
+        self.num_class = (
+            dataset.n_label
+            if self.rekt_objective.objective == ObjectiveName.multiclass
+            else None
+        )
         self.studies: Dict[MethodName, optuna.Study] = {}
         for method, param in zip(self.method, self.params):
             if valid_set is None:
@@ -79,6 +84,7 @@ class RektOptimizer:
                     objective=self.rekt_objective.objective,
                     method=method,
                     params=self.additional_params,
+                    num_class=self.num_class,
                 )
                 _param.update({**_objective, **_metric, **_addtional_params})
 
@@ -108,6 +114,7 @@ class RektOptimizer:
             objective=self.rekt_objective.objective,
             method=best_method,
             params=self.additional_params,
+            num_class=self.num_class,
         )
         _best_params.update({**_addtional_params})
         return {

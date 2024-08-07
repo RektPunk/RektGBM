@@ -26,4 +26,4 @@ jobs:
         with:
           black: true
           flake8: true
-          flake8_args: "--ignore=E266,E501"
+          flake8_args: "--ignore=E266,E501,W503"

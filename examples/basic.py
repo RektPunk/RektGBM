@@ -12,13 +12,11 @@ dtest = RektDataset(data=X_test, label=y_test)
 
 rekt_optimizer = RektOptimizer(method="both")
 rekt_optimizer.optimize_params(
-    dataset=RektDataset(X_train, y_train),
+    dataset=dtrain,
     n_trials=10,
 )
 print(rekt_optimizer.best_params)
 
 rekt_gbm = RektGBM(**rekt_optimizer.best_params)
-rekt_gbm.fit(
-    dataset=RektDataset(X_train, y_train),
-)
-preds = rekt_gbm.predict(RektDataset(X_test, y_train))
+rekt_gbm.fit(dataset=dtrain)
+preds = rekt_gbm.predict(dataset=dtest)
