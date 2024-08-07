@@ -17,8 +17,9 @@ dtrain = RektDataset(data=X_train, label=y_train)
 dtest = RektDataset(data=X_test, label=y_test)
 
 # Initialize RektOptimizer for automatic detection of task type, objective, and metric
-rekt_optimizer = RektOptimizer(method="both")
 # Optimization method: options are both (default), lightgbm, xgboost
+rekt_optimizer = RektOptimizer(method="both")
+
 
 # Optimize hyperparameters using the training dataset over a specified number of trials
 rekt_optimizer.optimize_params(dataset=dtrain, n_trials=10)
