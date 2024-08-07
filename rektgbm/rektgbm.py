@@ -28,16 +28,16 @@ class RektGBM(BaseGBM):
         dataset: RektDataset,
         valid_set: Optional[RektDataset] = None,
     ):
-        self.task_type = check_task_type(
+        self._task_type = check_task_type(
             target=dataset.label,
             task_type=self.task_type,
         )
         self.rekt_objective = RektObjective(
-            task_type=self.task_type,
+            task_type=self._task_type,
             objective=self.objective,
         )
         self.rekt_metric = RektMetric(
-            task_type=self.task_type,
+            task_type=self._task_type,
             metric=self.metric,
         )
 
@@ -45,8 +45,8 @@ class RektGBM(BaseGBM):
         _metric = self.rekt_metric.get_metric(method=self.method)
         self.params.update({**_objective, **_metric})
         self.engine = RektEngine(
-            params=self.params,
             method=self.method,
+            params=self.params,
         )
         self.engine.fit(dataset=dataset, valid_set=valid_set)
 
