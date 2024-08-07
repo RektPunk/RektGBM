@@ -20,7 +20,6 @@ dtest = RektDataset(data=X_test, label=y_test)
 # Optimization method: options are both (default), lightgbm, xgboost
 rekt_optimizer = RektOptimizer(method="both")
 
-
 # Optimize hyperparameters using the training dataset over a specified number of trials
 rekt_optimizer.optimize_params(dataset=dtrain, n_trials=10)
 
