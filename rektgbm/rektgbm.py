@@ -38,6 +38,7 @@ class RektGBM(BaseGBM):
         )
         self.rekt_metric = RektMetric(
             task_type=self._task_type,
+            objective=self.rekt_objective.objective,
             metric=self.metric,
         )
 

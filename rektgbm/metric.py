@@ -2,18 +2,20 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional
 
 from rektgbm.base import BaseEnum, MethodName
+from rektgbm.objective import ObjectiveName
 from rektgbm.task import TaskType
 
 
 class MetricName(BaseEnum):
     rmse: str = "rmse"
     mae: str = "mae"
-    mse: str = "mse"
     mape: str = "mape"
+    huber: str = "huber"
     gamma: str = "gamma"
     gamma_deviance: str = "gamma_deviance"
     poisson: str = "poisson"
     tweedie: str = "tweedie"
+    quantile: str = "quantile"
     logloss: str = "logloss"
     auc: str = "auc"
     mlogloss: str = "mlogloss"
@@ -28,6 +30,7 @@ class XgbMetricName(BaseEnum):
     mae: str = "mae"
     mape: str = "mape"
     mphe: str = "mphe"
+    quantile: str = "quantile"
     logloss: str = "logloss"
     error: str = "error"
     merror: str = "merror"
@@ -48,15 +51,11 @@ class XgbMetricName(BaseEnum):
 
 class LgbMetricName(BaseEnum):
     # https://lightgbm.readthedocs.io/en/latest/Parameters.html#metric
-    mae: str = "mae"
-    mse: str = "mse"
+    l1: str = "l1"
+    l2: str = "l2"
     rmse: str = "rmse"
     quantile: str = "quantile"
     mape: str = "mape"
-    binary_logloss: str = "binary_logloss"
-    binary_error: str = "binary_error"
-    multi_logloss: str = "multi_logloss"
-    multi_error: str = "multi_error"
     huber: str = "huber"
     fair: str = "fair"
     poisson: str = "poisson"
@@ -64,26 +63,29 @@ class LgbMetricName(BaseEnum):
     gamma_deviance: str = "gamma_deviance"
     tweedie: str = "tweedie"
     ndcg: str = "ndcg"
-    lambdarank: str = "ndcg"
+    map: str = "map"
+    auc: str = "auc"
+    average_precision: str = "average_precision"
+    binary_logloss: str = "binary_logloss"
+    binary_error: str = "binary_error"
+    auc_mu: str = "auc_mu"
+    multi_logloss: str = "multi_logloss"
+    multi_error: str = "multi_error"
     cross_entropy: str = "cross_entropy"
     cross_entropy_lambda: str = "cross_entropy_lambda"
     kullback_leibler: str = "kullback_leibler"
-    map: str = "map"
-    mean_average_precision: str = "mean_average_precision"
-    auc: str = "auc"
-    average_precision: str = "average_precision"
-    auc_mu: str = "auc_mu"
 
 
 TASK_METRIC_MAPPER: Dict[TaskType, List[MetricName]] = {
     TaskType.regression: [
         MetricName.rmse,
         MetricName.mae,
-        MetricName.mse,
+        MetricName.huber,
         MetricName.mape,
         MetricName.gamma,
         MetricName.gamma_deviance,
         MetricName.poisson,
+        MetricName.quantile,
         MetricName.tweedie,
     ],
     TaskType.binary: [
@@ -100,6 +102,21 @@ TASK_METRIC_MAPPER: Dict[TaskType, List[MetricName]] = {
 }
 
 
+OBJECTIVE_METRIC_MAPPER: Dict[ObjectiveName, MetricName] = {
+    ObjectiveName.rmse: MetricName.rmse,
+    ObjectiveName.mae: MetricName.mae,
+    ObjectiveName.huber: MetricName.huber,
+    ObjectiveName.poisson: MetricName.poisson,
+    ObjectiveName.quantile: MetricName.quantile,
+    ObjectiveName.gamma: MetricName.gamma,
+    ObjectiveName.tweedie: MetricName.tweedie,
+    ObjectiveName.binary: MetricName.logloss,
+    ObjectiveName.multiclass: MetricName.mlogloss,
+    ObjectiveName.lambdarank: MetricName.ndcg,
+    ObjectiveName.ndcg: MetricName.map,
+}
+
+
 METRIC_DICT_KEY_MAPPER: Dict[MethodName, str] = {
     MethodName.lightgbm: "metric",
     MethodName.xgboost: "eval_metric",
@@ -111,8 +128,12 @@ METRIC_ENGINE_MAPPER: Dict[MetricName, Dict[MethodName, str]] = {
         MethodName.xgboost: XgbMetricName.rmse.value,
     },
     MetricName.mae: {
-        MethodName.lightgbm: LgbMetricName.mae.value,
+        MethodName.lightgbm: LgbMetricName.l1.value,
         MethodName.xgboost: XgbMetricName.mae.value,
+    },
+    MetricName.huber: {
+        MethodName.lightgbm: LgbMetricName.huber.value,
+        MethodName.xgboost: XgbMetricName.mphe.value,
     },
     MetricName.logloss: {
         MethodName.lightgbm: LgbMetricName.binary_logloss.value,
@@ -146,6 +167,10 @@ METRIC_ENGINE_MAPPER: Dict[MetricName, Dict[MethodName, str]] = {
         MethodName.lightgbm: LgbMetricName.tweedie.value,
         MethodName.xgboost: XgbMetricName.tweedie_nloglik.value,
     },
+    MetricName.quantile: {
+        MethodName.lightgbm: LgbMetricName.quantile.value,
+        MethodName.xgboost: XgbMetricName.quantile.value,
+    },
     MetricName.ndcg: {
         MethodName.lightgbm: LgbMetricName.ndcg.value,
         MethodName.xgboost: XgbMetricName.ndcg.value,
@@ -160,6 +185,7 @@ METRIC_ENGINE_MAPPER: Dict[MetricName, Dict[MethodName, str]] = {
 @dataclass
 class RektMetric:
     task_type: TaskType
+    objective: ObjectiveName
     metric: Optional[str]
 
     def __post_init__(self) -> None:
@@ -167,8 +193,7 @@ class RektMetric:
             self.metric = MetricName.get(self.metric)
             self.__validate_metric()
         else:
-            _metrics = TASK_METRIC_MAPPER.get(self.task_type)
-            self.metric = _metrics[0]
+            self.metric = OBJECTIVE_METRIC_MAPPER.get(self.objective)
 
         self._metric_engine_mapper = METRIC_ENGINE_MAPPER.get(self.metric)
 
