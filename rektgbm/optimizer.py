@@ -2,6 +2,7 @@ from typing import Any, Callable, Dict, List, Optional, Union
 
 import optuna
 
+from rektgbm.addparams import set_additional_params
 from rektgbm.base import BaseEnum, MethodName, StateException
 from rektgbm.dataset import RektDataset
 from rektgbm.engine import RektEngine
@@ -14,9 +15,7 @@ from rektgbm.task import check_task_type
 class _RektMethods(BaseEnum):
     both: int = 1
     lightgbm: int = 2
-    lgb: int = 2
     xgboost: int = 3
-    xgb: int = 3
 
 
 class RektOptimizer:
@@ -27,6 +26,7 @@ class RektOptimizer:
         objective: Optional[str] = None,
         metric: Optional[str] = None,
         params: Optional[Union[List[Callable], Callable]] = None,
+        additional_params: Dict[str, Any] = {},
     ) -> None:
         if _RektMethods.both == _RektMethods.get(method):
             self.method = [MethodName.lightgbm, MethodName.xgboost]
@@ -45,6 +45,7 @@ class RektOptimizer:
         self.objective = objective
         self._task_type = task_type
         self.metric = metric
+        self.additional_params = additional_params
 
     def optimize_params(
         self,
@@ -73,7 +74,12 @@ class RektOptimizer:
                 _param = param(trial=trial)
                 _objective = self.rekt_objective.get_objective(method=method)
                 _metric = self.rekt_metric.get_metric(method=method)
-                _param.update({**_objective, **_metric})
+                _addtional_params = set_additional_params(
+                    objective=self.rekt_objective.objective,
+                    method=method,
+                    params=self.additional_params,
+                )
+                _param.update({**_objective, **_metric, **_addtional_params})
 
                 _engine = RektEngine(
                     params=_param,
@@ -96,9 +102,16 @@ class RektOptimizer:
         self.__check_optimized()
         best_method = min(self.studies, key=lambda k: self.studies[k].best_value)
         best_study = self.studies.get(best_method)
+        _best_params = best_study.best_params
+        _addtional_params = set_additional_params(
+            objective=self.rekt_objective.objective,
+            method=best_method,
+            params=self.additional_params,
+        )
+        _best_params.update({**_addtional_params})
         return {
             "method": best_method.value,
-            "params": best_study.best_params,
+            "params": _best_params,
             "task_type": self.task_type.value,
             "objective": self.rekt_objective.objective.value,
             "metric": self.rekt_metric.metric.value,

@@ -25,7 +25,7 @@ class XgbObjectiveName(BaseEnum):
     squarederror: str = "reg:squarederror"
     squaredlogerror: str = "reg:squaredlogerror"
     pseudohubererror: str = "reg:pseudohubererror"
-    absoluteerror: str = "reg:reg:absoluteerror"
+    absoluteerror: str = "reg:absoluteerror"
     quantileerror: str = "reg:quantileerror"
     logistic: str = "binary:logistic"
     logitraw: str = "binary:logitraw"

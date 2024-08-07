@@ -36,8 +36,6 @@ class BaseGBM(ABC):
 class MethodName(BaseEnum):
     lightgbm: str = "lightgbm"
     xgboost: str = "xgboost"
-    lgb: str = "lightgbm"
-    xgb: str = "xgboost"
 
 
 XdataLike = Union[pd.DataFrame, pd.Series, np.ndarray]
