@@ -13,8 +13,6 @@ class MetricName(BaseEnum):
     huber: str = "huber"
     gamma: str = "gamma"
     gamma_deviance: str = "gamma_deviance"
-    poisson: str = "poisson"
-    tweedie: str = "tweedie"
     quantile: str = "quantile"
     logloss: str = "logloss"
     auc: str = "auc"
@@ -43,7 +41,6 @@ class XgbMetricName(BaseEnum):
     gamma_nloglik: str = "gamma-nloglik"
     gamma_deviance: str = "gamma-deviance"
     poisson_nloglik: str = "poisson-nloglik"
-    poisson_deviance: str = "poisson-deviance"
     tweedie_nloglik: str = "tweedie-nloglik"
     aft_nloglik: str = "aft-nloglik"
     interval_regression_accuracy: str = "interval-regression-accuracy"
@@ -84,9 +81,7 @@ TASK_METRIC_MAPPER: Dict[TaskType, List[MetricName]] = {
         MetricName.mape,
         MetricName.gamma,
         MetricName.gamma_deviance,
-        MetricName.poisson,
         MetricName.quantile,
-        MetricName.tweedie,
     ],
     TaskType.binary: [
         MetricName.logloss,
@@ -106,10 +101,8 @@ OBJECTIVE_METRIC_MAPPER: Dict[ObjectiveName, MetricName] = {
     ObjectiveName.rmse: MetricName.rmse,
     ObjectiveName.mae: MetricName.mae,
     ObjectiveName.huber: MetricName.huber,
-    ObjectiveName.poisson: MetricName.poisson,
     ObjectiveName.quantile: MetricName.quantile,
     ObjectiveName.gamma: MetricName.gamma,
-    ObjectiveName.tweedie: MetricName.tweedie,
     ObjectiveName.binary: MetricName.logloss,
     ObjectiveName.multiclass: MetricName.mlogloss,
     ObjectiveName.lambdarank: MetricName.ndcg,
@@ -158,14 +151,6 @@ METRIC_ENGINE_MAPPER: Dict[MetricName, Dict[MethodName, str]] = {
     MetricName.gamma_deviance: {
         MethodName.lightgbm: LgbMetricName.gamma_deviance.value,
         MethodName.xgboost: XgbMetricName.gamma_deviance.value,
-    },
-    MetricName.poisson: {
-        MethodName.lightgbm: LgbMetricName.poisson.value,
-        MethodName.xgboost: XgbMetricName.poisson_nloglik.value,
-    },
-    MetricName.tweedie: {
-        MethodName.lightgbm: LgbMetricName.tweedie.value,
-        MethodName.xgboost: XgbMetricName.tweedie_nloglik.value,
     },
     MetricName.quantile: {
         MethodName.lightgbm: LgbMetricName.quantile.value,
