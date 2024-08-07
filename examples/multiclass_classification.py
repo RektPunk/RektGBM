@@ -4,9 +4,9 @@ from sklearn.model_selection import train_test_split
 
 from rektgbm import RektDataset, RektGBM, RektOptimizer
 
-# Generate a synthetic binary classification dataset
+# Generate a synthetic multiclass classification dataset
 X, y = make_classification(
-    n_samples=10_000, n_features=10, n_informative=5, n_classes=2
+    n_samples=10_000, n_features=10, n_informative=5, n_classes=5
 )
 
 # Split the dataset into training and testing sets
@@ -23,10 +23,10 @@ rekt_optimizer = RektOptimizer()
 
 # Alternatively, manually select optimizer settings (commented out)
 # rekt_optimizer = RektOptimizer(
-#     method="lightgbm",  # Optimization method: options are both, lightgbm, xgboost
-#     task_type="binary", # Type of task: binary
-#     objective="binary", # Objective function
-#     metric = "auc",     # Metric: options are logloss and auc
+#     method="lightgbm",          # Optimization method: options are both, lightgbm, xgboost
+#     task_type="multiclass",     # Type of task: multiclass
+#     objective="multiclass",     # Objective function
+#     metric="mlogloss",          # Metric
 # )
 
 # Optimize hyperparameters using the training dataset over a specified number of trials
@@ -42,4 +42,4 @@ rekt_gbm = RektGBM(**rekt_optimizer.best_params)
 rekt_gbm.fit(dataset=dtrain)
 
 # Predict on the test dataset using the trained model
-preds = rekt_gbm.predict(RektDataset(X_test, y_train))
+preds = rekt_gbm.predict(dataset=dtest)

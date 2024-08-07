@@ -1,8 +1,9 @@
-from typing import Dict, Union
+from typing import Any, Dict, Optional, Union
 
 from optuna import Trial
 
 from rektgbm.base import MethodName
+from rektgbm.objective import ObjectiveName
 
 
 def get_lgb_params(trial: Trial) -> Dict[str, Union[float, int]]:
@@ -39,3 +40,24 @@ METHOD_PARAMS_MAPPER = {
     MethodName.lightgbm: get_lgb_params,
     MethodName.xgboost: get_xgb_params,
 }
+
+
+def set_additional_params(
+    objective: ObjectiveName,
+    method: MethodName,
+    params: Dict[str, Any],
+    num_class: Optional[int],
+) -> Dict[str, Any]:
+    if objective == ObjectiveName.quantile:
+        if method == MethodName.lightgbm and "quantile_alpha" in params.keys():
+            params["alpha"] = params.pop("quantile_alpha")
+        elif method == MethodName.xgboost and "alpha" in params.keys():
+            params["quantile_alpha"] = params.pop("alpha")
+    elif objective == ObjectiveName.huber:
+        if method == MethodName.lightgbm and "huber_slope" in params.keys():
+            params["alpha"] = params.pop("quantile_alpha")
+        elif method == MethodName.xgboost and "alpha" in params.keys():
+            params["huber_slope"] = params.pop("alpha")
+    elif objective == ObjectiveName.multiclass:
+        params["num_class"] = num_class
+    return params
