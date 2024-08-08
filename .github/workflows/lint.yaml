@@ -1,6 +1,10 @@
 name: Lint
 
 on:
+  push:
+    paths:
+      - '**.py'
+
   pull_request:
     types: [opened, reopened, ready_for_review, review_requested]
 
