@@ -42,4 +42,4 @@ rekt_gbm = RektGBM(**rekt_optimizer.best_params)
 rekt_gbm.fit(dataset=dtrain)
 
 # Predict on the test dataset using the trained model
-preds = rekt_gbm.predict(RektDataset(X_test, y_train))
+preds = rekt_gbm.predict(dataset=dtest)
