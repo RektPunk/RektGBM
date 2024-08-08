@@ -29,7 +29,7 @@ def check_task_type(
     target: YdataLike,
     task_type: Optional[str],
 ) -> TaskType:
-    _type_inferred: str = type_of_target(target.values)
+    _type_inferred: str = type_of_target(y=target)
     _sklearn_task_type = SklearnTaskType.get(_type_inferred)
     _task_types = SKLEARN_TASK_TYPE_MAPPER.get(_sklearn_task_type)
     if task_type is not None:
