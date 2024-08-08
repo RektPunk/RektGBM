@@ -8,7 +8,7 @@ from rektgbm.engine import RektEngine
 from rektgbm.metric import RektMetric
 from rektgbm.objective import ObjectiveName, RektObjective
 from rektgbm.param import METHOD_PARAMS_MAPPER, set_additional_params
-from rektgbm.task import check_task_type
+from rektgbm.task import TaskType, check_task_type
 
 
 class _RektMethods(BaseEnum):
@@ -42,7 +42,7 @@ class RektOptimizer:
         else:
             self.params = [METHOD_PARAMS_MAPPER.get(method) for method in self.method]
         self.objective = objective
-        self._task_type = task_type
+        self.task_type = task_type
         self.metric = metric
         self.additional_params = additional_params
 
@@ -52,29 +52,34 @@ class RektOptimizer:
         n_trials: int,
         valid_set: Optional[RektDataset] = None,
     ) -> Dict[str, Any]:
-        self.task_type = check_task_type(
+        self._task_type = check_task_type(
             target=dataset.label,
-            task_type=self._task_type,
+            task_type=self.task_type,
         )
         self.rekt_objective = RektObjective(
-            task_type=self.task_type,
+            task_type=self._task_type,
             objective=self.objective,
         )
         self.rekt_metric = RektMetric(
-            task_type=self.task_type,
+            task_type=self._task_type,
             objective=self.rekt_objective.objective,
             metric=self.metric,
         )
+        if self._task_type in {TaskType.binary, TaskType.multiclass, TaskType.rank}:
+            _label_encoder = dataset.fit_transform_label()
+            self._label_encoder_used = True
 
         self.num_class = (
             dataset.n_label
             if self.rekt_objective.objective == ObjectiveName.multiclass
             else None
         )
+        if valid_set is not None and self.__is_label_encoder_used:
+            valid_set.transform_label(label_encoder=_label_encoder)
+        elif valid_set is None:
+            dataset, valid_set = dataset.split()
         self.studies: Dict[MethodName, optuna.Study] = {}
         for method, param in zip(self.method, self.params):
-            if valid_set is None:
-                dataset, valid_set = dataset.split()
 
             def _study_func(trial: optuna.Trial) -> float:
                 _param = param(trial=trial)
@@ -120,7 +125,7 @@ class RektOptimizer:
         return {
             "method": best_method.value,
             "params": _best_params,
-            "task_type": self.task_type.value,
+            "task_type": self._task_type.value,
             "objective": self.rekt_objective.objective.value,
             "metric": self.rekt_metric.metric.value,
         }
@@ -129,3 +134,7 @@ class RektOptimizer:
         """Check if the optimization process has been completed."""
         if not getattr(self, "_is_optimized", False):
             raise StateException("Optimization is not completed.")
+
+    @property
+    def __is_label_encoder_used(self):
+        return getattr(self, "_label_encoder_used", False)
