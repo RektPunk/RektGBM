@@ -2,9 +2,11 @@ from dataclasses import dataclass
 from typing import Dict, Optional, Tuple, Union
 
 import lightgbm as lgb
+import numpy as np
 import pandas as pd
 import xgboost as xgb
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
 
 from rektgbm.base import (
     BaseEnum,
@@ -48,10 +50,38 @@ def _train_valid_split(
 class RektDataset:
     data: XdataLike
     label: Optional[YdataLike] = None
+    reference: Optional["RektDataset"] = None
+    skip_post_init: bool = False
 
-    def __post_init__(self):
-        self.label = pd.Series(self.label)
+    def __post_init__(self) -> None:
         self._is_none_label = True if self.label is None else False
+        if self.skip_post_init:
+            return
+
+        if not isinstance(self.data, pd.DataFrame):
+            self.data = pd.DataFrame(self.data)
+
+        if self.reference is None:
+            self.encoders: Dict[str, LabelEncoder] = {}
+            for col in self.data.columns:
+                if self.data[col].dtype == "object":
+                    _encoder = LabelEncoder()
+                    self.data[col] = _encoder.fit_transform(self.data[col])
+                    self.encoders.update({col: _encoder})
+        else:
+            for col, _encoder in self.reference.encoders.items():
+                self.data[col] = _encoder.transform(self.data[col])
+
+    def fit_transform_label(self) -> LabelEncoder:
+        if self.__is_label_transformed:
+            return self.label_encoder
+        self.label_encoder = LabelEncoder()
+        self.label = self.label_encoder.fit_transform(self.label)
+        self._is_transformed = True
+        return self.label_encoder
+
+    def transform_label(self, label_encoder: LabelEncoder) -> None:
+        self.label = label_encoder.transform(self.label)
 
     def dtrain(self, method: MethodName) -> DataLike:
         self.__check_label_available()
@@ -73,8 +103,8 @@ class RektDataset:
         train_data, valid_data, train_label, valid_label = _train_valid_split(
             data=self.data, label=self.label
         )
-        dtrain = RektDataset(data=train_data, label=train_label)
-        dvalid = RektDataset(data=valid_data, label=valid_label)
+        dtrain = RektDataset(data=train_data, label=train_label, skip_post_init=True)
+        dvalid = RektDataset(data=valid_data, label=valid_label, skip_post_init=True)
         return dtrain, dvalid
 
     def dsplit(self, method: MethodName) -> Tuple[DataLike, DataLike]:
@@ -92,9 +122,16 @@ class RektDataset:
 
     @property
     def n_label(self) -> int:
-        return int(self.label.nunique())
+        if isinstance(self.label, pd.Series):
+            return int(self.label.nunique())
+        elif isinstance(self.label, np.ndarray):
+            return len(np.unique(self.label))
 
     def __check_label_available(self) -> None:
         """Check if the label is available, raises an exception if not."""
         if getattr(self, "_is_none_label", False):
             raise AttributeError("Label is not available because it is set to None.")
+
+    @property
+    def __is_label_transformed(self) -> bool:
+        return getattr(self, "_is_transformed", False)
