@@ -2,8 +2,8 @@
 
 
 <p align="center">
-  <a href="https://github.com/RektPunk/MQBoost/releases/latest">
-    <img alt="Release" src="https://img.shields.io/github/v/release/RektPunk/mqboost.svg">
+  <a href="https://github.com/RektPunk/RektGBM/releases/latest">
+    <img alt="Release" src="https://img.shields.io/github/v/release/RektPunk/rektgbm.svg">
   </a>
   <a href="https://github.com/RektPunk/RektGBM/blob/main/LICENSE">
     <img alt="License" src="https://img.shields.io/github/license/RektPunk/RektGBM.svg">
