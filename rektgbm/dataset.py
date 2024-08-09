@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 import xgboost as xgb
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
 
 from rektgbm.base import (
     BaseEnum,
@@ -16,6 +15,7 @@ from rektgbm.base import (
     XdataLike,
     YdataLike,
 )
+from rektgbm.encoder import RektLabelEncoder
 
 
 class _TypeName(BaseEnum):
@@ -62,26 +62,26 @@ class RektDataset:
             self.data = pd.DataFrame(self.data)
 
         if self.reference is None:
-            self.encoders: Dict[str, LabelEncoder] = {}
+            self.encoders: Dict[str, RektLabelEncoder] = {}
             for col in self.data.columns:
                 if self.data[col].dtype == "object":
-                    _encoder = LabelEncoder()
+                    _encoder = RektLabelEncoder()
                     self.data[col] = _encoder.fit_transform(self.data[col])
                     self.encoders.update({col: _encoder})
         else:
             for col, _encoder in self.reference.encoders.items():
                 self.data[col] = _encoder.transform(self.data[col])
 
-    def fit_transform_label(self) -> LabelEncoder:
+    def fit_transform_label(self) -> RektLabelEncoder:
         if self.__is_label_transformed:
             return self.label_encoder
-        self.label_encoder = LabelEncoder()
-        self.label = self.label_encoder.fit_transform(self.label)
+        self.label_encoder = RektLabelEncoder()
+        self.label = self.label_encoder.fit_transform_label(series=self.label)
         self._is_transformed = True
         return self.label_encoder
 
-    def transform_label(self, label_encoder: LabelEncoder) -> None:
-        self.label = label_encoder.transform(self.label)
+    def transform_label(self, label_encoder: RektLabelEncoder) -> None:
+        self.label = label_encoder.transform_label(series=self.label)
 
     def dtrain(self, method: MethodName) -> DataLike:
         self.__check_label_available()

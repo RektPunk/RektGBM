@@ -71,7 +71,7 @@ class RektGBM(BaseGBM):
             preds = np.around(preds).astype(int)
 
         if self.__is_label_encoder_used:
-            preds = self.label_encoder.inverse_transform(y=preds)
+            preds = self.label_encoder.inverse_transform(series=preds)
 
         return preds
 
