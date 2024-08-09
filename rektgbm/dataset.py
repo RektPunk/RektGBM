@@ -50,6 +50,7 @@ def _train_valid_split(
 class RektDataset:
     data: XdataLike
     label: Optional[YdataLike] = None
+    group: Optional[YdataLike] = None
     reference: Optional["RektDataset"] = None
     skip_post_init: bool = False
 
@@ -89,7 +90,7 @@ class RektDataset:
             method=method,
             dtype=_TypeName.train_dtype,
         )
-        return train_dtype(data=self.data, label=self.label)
+        return train_dtype(data=self.data, label=self.label, group=self.group)
 
     def dpredict(self, method: MethodName) -> Union[DataLike, XdataLike]:
         predict_dtype = _get_dtype(
