@@ -27,19 +27,21 @@ SKLEARN_TASK_TYPE_MAPPER: Dict[SklearnTaskType, List[TaskType]] = {
 
 def check_task_type(
     target: YdataLike,
+    group: Optional[YdataLike],
     task_type: Optional[str],
 ) -> TaskType:
     _type_inferred: str = type_of_target(y=target)
     _sklearn_task_type = SklearnTaskType.get(_type_inferred)
     _task_types = SKLEARN_TASK_TYPE_MAPPER.get(_sklearn_task_type)
-    if task_type is not None:
+    if task_type is None:
+        if group is not None:
+            return TaskType.rank
+        return _task_types[0]
+    elif task_type is not None:
         _user_defined_task_type = TaskType.get(task_type)
         if _user_defined_task_type not in _task_types:
             raise ValueError(
                 "The inferred 'task_type' does not match the provided one.'task_type'. "
                 f"Expected one of '{[_.value for _ in _task_types]}'."
             )
-        _task_type = _user_defined_task_type
-    else:
-        _task_type = _task_types[0]
-    return _task_type
+        return _user_defined_task_type
