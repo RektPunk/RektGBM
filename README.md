@@ -1,4 +1,7 @@
-# RektGBM
+<div style="text-align: center;">
+  <img src="assets/image/logo.png" alt="logo" width=400, height=240>
+</div>
+
 
 
 <p align="center">
