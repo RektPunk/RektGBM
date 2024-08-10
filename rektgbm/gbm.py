@@ -62,6 +62,7 @@ class RektGBM(BaseGBM):
         self.engine = RektEngine(
             method=self.method,
             params=self.params,
+            task_type=self._task_type,
         )
         self.engine.fit(dataset=dataset, valid_set=valid_set)
 
