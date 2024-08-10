@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/RektPunk/RektGBM/blob/main/assets/image/logo.png" alt="logo" width=400, height=240>
+  <img src="assets/image/logo.png" alt="logo" width=400, height=240>
 </p>
 
 <p align="center">
