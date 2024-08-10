@@ -3,8 +3,14 @@ name = "rektgbm"
 version = "0.1.1"
 description = "No-brainer machine learning solution to achieve satisfactory performance"
 authors = ["RektPunk <rektpunk@gmail.com>"]
-license = "LICENSE"
+license = "MIT"
 readme = "README.md"
+repository = "https://github.com/RektPunk/RektGBM"
+classifiers = [
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+
 
 [tool.poetry.dependencies]
 python = "^3.12"
