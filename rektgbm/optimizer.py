@@ -52,8 +52,9 @@ class RektOptimizer:
         n_trials: int,
         valid_set: Optional[RektDataset] = None,
     ) -> Dict[str, Any]:
-        self._task_type = check_task_type(
+        self._task_type: TaskType = check_task_type(
             target=dataset.label,
+            group=dataset.group,
             task_type=self.task_type,
         )
         self.rekt_objective = RektObjective(
@@ -74,25 +75,31 @@ class RektOptimizer:
             if self.rekt_objective.objective == ObjectiveName.multiclass
             else None
         )
-        if valid_set is not None and self.__is_label_encoder_used:
-            valid_set.transform_label(label_encoder=_label_encoder)
-        elif valid_set is None:
+        if valid_set is None:
+            if self._task_type == TaskType.rank:
+                raise ValueError(
+                    "A validation set must be provided when using the 'rank' task."
+                )
             dataset, valid_set = dataset.split()
+        else:
+            if self.__is_label_encoder_used:
+                valid_set.transform_label(label_encoder=_label_encoder)
+
         self.studies: Dict[MethodName, optuna.Study] = {}
         for method, param in zip(self.method, self.params):
+            _addtional_params = set_additional_params(
+                objective=self.rekt_objective.objective,
+                metric=self.rekt_metric.get_metric_str(method=method),
+                method=method,
+                params=self.additional_params,
+                num_class=self.num_class,
+            )
+            _objective = self.rekt_objective.get_objective_dict(method=method)
+            _metric = self.rekt_metric.get_metric_dict(method=method)
 
             def _study_func(trial: optuna.Trial) -> float:
                 _param = param(trial=trial)
-                _objective = self.rekt_objective.get_objective(method=method)
-                _metric = self.rekt_metric.get_metric(method=method)
-                _addtional_params = set_additional_params(
-                    objective=self.rekt_objective.objective,
-                    method=method,
-                    params=self.additional_params,
-                    num_class=self.num_class,
-                )
                 _param.update({**_objective, **_metric, **_addtional_params})
-
                 _engine = RektEngine(
                     params=_param,
                     method=method,
@@ -100,9 +107,10 @@ class RektOptimizer:
                 _engine.fit(dataset=dataset, valid_set=valid_set)
                 return _engine.eval_loss
 
+            _direction = "maximize" if self._task_type == TaskType.rank else "minimize"
             study = optuna.create_study(
                 study_name=f"Rekt_{method.value}",
-                direction="minimize",
+                direction=_direction,
                 load_if_exists=True,
             )
             study.optimize(_study_func, n_trials=n_trials)
@@ -116,9 +124,10 @@ class RektOptimizer:
         best_study = self.studies.get(best_method)
         _best_params = best_study.best_params
         _addtional_params = set_additional_params(
+            params=self.additional_params,
             objective=self.rekt_objective.objective,
             method=best_method,
-            params=self.additional_params,
+            metric=self.rekt_metric.get_metric_str(method=best_method),
             num_class=self.num_class,
         )
         _best_params.update({**_addtional_params})

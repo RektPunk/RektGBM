@@ -138,7 +138,7 @@ class RektObjective:
     def get_objective_str(self, method: MethodName) -> str:
         return self._objective_engine_mapper.get(method)
 
-    def get_objective(self, method: MethodName) -> Dict[str, str]:
+    def get_objective_dict(self, method: MethodName) -> Dict[str, str]:
         return {OBJECTIVE_DICT_KEY: self.get_objective_str(method=method)}
 
     def __validate_objective(self) -> None:

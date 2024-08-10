@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional, Union
 from optuna import Trial
 
 from rektgbm.base import MethodName
-from rektgbm.metric import MetricName, XgbMetricName
+from rektgbm.metric import MetricName
 from rektgbm.objective import ObjectiveName
 
 
@@ -19,7 +19,7 @@ def get_lgb_params(trial: Trial) -> Dict[str, Union[float, int]]:
         "feature_fraction": trial.suggest_float("feature_fraction", 0.4, 1.0),
         "bagging_fraction": trial.suggest_float("bagging_fraction", 0.4, 1.0),
         "bagging_freq": trial.suggest_int("bagging_freq", 1, 7),
-        "n_estimators": trial.suggest_categorical("n_estimators", [7000, 15000, 20000]),
+        # "n_estimators": trial.suggest_categorical("n_estimators", [7000, 15000, 20000]),
     }
 
 
@@ -64,10 +64,11 @@ def set_additional_params(
     elif objective == ObjectiveName.multiclass:
         _params["num_class"] = num_class
 
-    if (
-        metric in {XgbMetricName.ndcg.value, XgbMetricName.map.value}
-        and method == MethodName.xgboost
-    ):
-        _eval_at = _params.pop("eval_at")
-        _params["eval_metric"] = f"{metric}@{_eval_at}"
+    if metric in {MetricName.ndcg.value, MetricName.map.value}:
+        _eval_at_defalut: int = 5
+        _eval_at = _params.pop("eval_at", _eval_at_defalut)
+        if method == MethodName.xgboost:
+            _params["eval_metric"] = f"{metric}@{_eval_at}"
+        elif method == MethodName.lightgbm:
+            _params["eval_at"] = _eval_at
     return _params
