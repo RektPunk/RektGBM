@@ -30,7 +30,7 @@ def test_rektdataset_post_init():
     dataset = RektDataset(
         data=regression_data, label=regression_label, skip_post_init=True
     )
-    assert isinstance(dataset, np.ndarray)
+    assert isinstance(dataset.data, np.ndarray)
 
 
 # Test fit_transform_label
