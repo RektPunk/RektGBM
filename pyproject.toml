@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "rektgbm"
-version = "0.0.0"
+version = "0.1.0"
 description = ""
 authors = ["RektPunk <rektpunk@gmail.com>"]
 license = "LICENSE"
