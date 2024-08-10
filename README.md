@@ -65,5 +65,8 @@ preds = rekt_gbm.predict(dataset=dtest)
 # DONE!
 ```
 
-## More Examples
+# More Examples
 For more detailed examples, check out the [Examples](https://github.com/RektPunk/RektGBM/tree/main/examples) section.
+
+# Contribution
+Welcome all contributions! Please note that this project might have some bugs, so your contributions in identifying and fixing them are especially valuable! Whether you want to create an issue or submit a pull request, your input is appreciated. Feel free to get involved in any way that suits you.
