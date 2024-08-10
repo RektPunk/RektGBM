@@ -16,6 +16,7 @@ from rektgbm.base import (
     YdataLike,
 )
 from rektgbm.encoder import RektLabelEncoder
+from rektgbm.task import TaskType
 
 
 class _TypeName(BaseEnum):
@@ -41,9 +42,15 @@ def _get_dtype(method: MethodName, dtype: _TypeName):
 
 
 def _train_valid_split(
-    data: XdataLike, label: YdataLike
+    data: XdataLike, label: YdataLike, task_type: TaskType
 ) -> Tuple[XdataLike, XdataLike, YdataLike, YdataLike]:
-    return train_test_split(data, label, test_size=0.2, random_state=42)
+    if task_type == TaskType.regression:
+        _stratify = pd.cut(label, bins=10, labels=False)
+    else:
+        _stratify = label
+    return train_test_split(
+        data, label, test_size=0.2, random_state=42, stratify=_stratify
+    )
 
 
 @dataclass
@@ -99,19 +106,25 @@ class RektDataset:
         )
         return predict_dtype(data=self.data)
 
-    def split(self) -> Tuple["RektDataset", "RektDataset"]:
+    def split(self, task_type: TaskType) -> Tuple["RektDataset", "RektDataset"]:
         self.__check_label_available()
         train_data, valid_data, train_label, valid_label = _train_valid_split(
-            data=self.data, label=self.label
+            data=self.data,
+            label=self.label,
+            task_type=task_type,
         )
         dtrain = RektDataset(data=train_data, label=train_label, skip_post_init=True)
         dvalid = RektDataset(data=valid_data, label=valid_label, skip_post_init=True)
         return dtrain, dvalid
 
-    def dsplit(self, method: MethodName) -> Tuple[DataLike, DataLike]:
+    def dsplit(
+        self, method: MethodName, task_type: TaskType
+    ) -> Tuple[DataLike, DataLike]:
         self.__check_label_available()
         train_data, valid_data, train_label, valid_label = _train_valid_split(
-            data=self.data, label=self.label
+            data=self.data,
+            label=self.label,
+            task_type=task_type,
         )
         train_dtype = _get_dtype(
             method=method,

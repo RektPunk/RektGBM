@@ -7,6 +7,7 @@ import xgboost as xgb
 from rektgbm.base import BaseGBM, MethodName, StateException
 from rektgbm.dataset import RektDataset
 from rektgbm.metric import METRIC_DICT_KEY_MAPPER, LgbMetricName
+from rektgbm.task import TaskType
 
 _VALID_STR: str = "valid"
 
@@ -16,9 +17,11 @@ class RektEngine(BaseGBM):
         self,
         method: MethodName,
         params: Dict[str, Any],
+        task_type: TaskType,
     ) -> None:
         self.method = method
         self.params = params
+        self.task_type = task_type
 
     def fit(
         self,
@@ -26,7 +29,9 @@ class RektEngine(BaseGBM):
         valid_set: Optional[RektDataset],
     ) -> None:
         if valid_set is None:
-            dtrain, dvalid = dataset.dsplit(method=self.method)
+            dtrain, dvalid = dataset.dsplit(
+                method=self.method, task_type=self.task_type
+            )
         else:
             dtrain = dataset.dtrain(method=self.method)
             dvalid = valid_set.dtrain(method=self.method)
@@ -62,13 +67,12 @@ class RektEngine(BaseGBM):
     def eval_loss(self) -> float:
         self.__check_fitted()
         metric_str = METRIC_DICT_KEY_MAPPER.get(self.method)
+        _metric_name = self.params.get(metric_str)
         if self.__is_lgb:
-            _metric_name = self.params.get(metric_str)
             if _metric_name in {LgbMetricName.ndcg.value, LgbMetricName.map.value}:
                 _metric_name = f"{_metric_name}@{self.params['eval_at']}"
             return float(self.model.best_score[_VALID_STR][_metric_name])
         elif self.__is_xgb:
-            _metric_name = self.params.get(metric_str)
             return float(self.evals_result[_VALID_STR][_metric_name][-1])
 
     def __check_fitted(self) -> None:

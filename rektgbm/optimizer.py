@@ -80,7 +80,7 @@ class RektOptimizer:
                 raise ValueError(
                     "A validation set must be provided when using the 'rank' task."
                 )
-            dataset, valid_set = dataset.split()
+            dataset, valid_set = dataset.split(task_type=self._task_type)
         else:
             if self.__is_label_encoder_used:
                 valid_set.transform_label(label_encoder=_label_encoder)
@@ -103,6 +103,7 @@ class RektOptimizer:
                 _engine = RektEngine(
                     params=_param,
                     method=method,
+                    task_type=self._task_type,
                 )
                 _engine.fit(dataset=dataset, valid_set=valid_set)
                 return _engine.eval_loss
