@@ -1,6 +1,6 @@
-<div style="text-align: center;">
+<p align="center">
   <img src="assets/image/logo.png" alt="logo" width=400, height=240>
-</div>
+</p>
 
 <p align="center">
   <a href="https://github.com/RektPunk/RektGBM/releases/latest">
