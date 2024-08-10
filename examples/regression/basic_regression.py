@@ -25,7 +25,7 @@ rekt_optimizer = RektOptimizer(method="both")
 #     method="both",          # Method: options are both (default), lightgbm, xgboost
 #     task_type="regression", # Type of task: regression
 #     objective="rmse",       # Objective function: options are rmse, mae
-#     metric="rmse"           # rmse, mae, mape
+#     metric="rmse"           # Metric: options are rmse, mae, mape
 # )
 
 # Optimize hyperparameters using the training dataset over a specified number of trials

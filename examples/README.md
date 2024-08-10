@@ -8,6 +8,8 @@ examples
 ├── classification
 │   ├── binary_classfication.py
 │   └── multiclass_classification.py
+├── rank
+│   ├── basic_rank.py
 ├── regression
 │   ├── basic_regression.py
 │   ├── gamma_regression.py

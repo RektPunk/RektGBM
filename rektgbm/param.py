@@ -3,6 +3,7 @@ from typing import Any, Dict, Optional, Union
 from optuna import Trial
 
 from rektgbm.base import MethodName
+from rektgbm.metric import MetricName
 from rektgbm.objective import ObjectiveName
 
 
@@ -43,21 +44,31 @@ METHOD_PARAMS_MAPPER = {
 
 
 def set_additional_params(
-    objective: ObjectiveName,
-    method: MethodName,
     params: Dict[str, Any],
+    objective: ObjectiveName,
+    metric: str,
+    method: MethodName,
     num_class: Optional[int],
 ) -> Dict[str, Any]:
+    _params = params.copy()
     if objective == ObjectiveName.quantile:
-        if method == MethodName.lightgbm and "quantile_alpha" in params.keys():
-            params["alpha"] = params.pop("quantile_alpha")
-        elif method == MethodName.xgboost and "alpha" in params.keys():
-            params["quantile_alpha"] = params.pop("alpha")
+        if method == MethodName.lightgbm and "quantile_alpha" in _params.keys():
+            _params["alpha"] = _params.pop("quantile_alpha")
+        elif method == MethodName.xgboost and "alpha" in _params.keys():
+            _params["quantile_alpha"] = _params.pop("alpha")
     elif objective == ObjectiveName.huber:
-        if method == MethodName.lightgbm and "huber_slope" in params.keys():
-            params["alpha"] = params.pop("quantile_alpha")
-        elif method == MethodName.xgboost and "alpha" in params.keys():
-            params["huber_slope"] = params.pop("alpha")
+        if method == MethodName.lightgbm and "huber_slope" in _params.keys():
+            _params["alpha"] = _params.pop("quantile_alpha")
+        elif method == MethodName.xgboost and "alpha" in _params.keys():
+            _params["huber_slope"] = _params.pop("alpha")
     elif objective == ObjectiveName.multiclass:
-        params["num_class"] = num_class
-    return params
+        _params["num_class"] = num_class
+
+    if metric in {MetricName.ndcg.value, MetricName.map.value}:
+        _eval_at_defalut: int = 5
+        _eval_at = _params.pop("eval_at", _eval_at_defalut)
+        if method == MethodName.xgboost:
+            _params["eval_metric"] = f"{metric}@{_eval_at}"
+        elif method == MethodName.lightgbm:
+            _params["eval_at"] = _eval_at
+    return _params

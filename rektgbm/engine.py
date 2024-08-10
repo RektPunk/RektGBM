@@ -6,7 +6,7 @@ import xgboost as xgb
 
 from rektgbm.base import BaseGBM, MethodName, StateException
 from rektgbm.dataset import RektDataset
-from rektgbm.metric import METRIC_DICT_KEY_MAPPER
+from rektgbm.metric import METRIC_DICT_KEY_MAPPER, LgbMetricName
 
 _VALID_STR: str = "valid"
 
@@ -64,6 +64,8 @@ class RektEngine(BaseGBM):
         metric_str = METRIC_DICT_KEY_MAPPER.get(self.method)
         if self.__is_lgb:
             _metric_name = self.params.get(metric_str)
+            if _metric_name in {LgbMetricName.ndcg.value, LgbMetricName.map.value}:
+                _metric_name = f"{_metric_name}@{self.params['eval_at']}"
             return float(self.model.best_score[_VALID_STR][_metric_name])
         elif self.__is_xgb:
             _metric_name = self.params.get(metric_str)
