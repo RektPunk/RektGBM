@@ -45,7 +45,11 @@ def _train_valid_split(
     data: XdataLike, label: YdataLike, task_type: TaskType
 ) -> Tuple[XdataLike, XdataLike, YdataLike, YdataLike]:
     if task_type == TaskType.regression:
-        _stratify = pd.cut(label, bins=10, labels=False)
+        for _bin in range(5, 0, -1):
+            try:
+                _stratify = pd.cut(label, bins=_bin, labels=False)
+            except Exception:
+                continue
     else:
         _stratify = label
     return train_test_split(

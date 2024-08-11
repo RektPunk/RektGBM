@@ -42,7 +42,7 @@ def check_task_type(
     _user_defined_task_type = TaskType.get(task_type)
     if _user_defined_task_type not in _task_types:
         raise ValueError(
-            "The inferred 'task_type' does not match the provided one.'task_type'. "
+            "The inferred 'task_type' does not match the provided one. "
             f"Expected one of '{[_.value for _ in _task_types]}'."
         )
     return _user_defined_task_type
