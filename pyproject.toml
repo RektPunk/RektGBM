@@ -30,6 +30,7 @@ ipykernel = "^6.29.5"
 pytest = "^8.3.2"
 flake8 = "^7.1.1"
 pytest-cov = "^5.0.0"
+debuggy = "^3.0.1"
 
 [build-system]
 requires = ["poetry-core"]
