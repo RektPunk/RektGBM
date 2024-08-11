@@ -80,8 +80,8 @@ def test_rektdataset_dpredict(method, expected_type):
 
 # Test split method
 def test_rektdataset_split():
-    dataset = RektDataset(data=regression_data, label=regression_label)
-    dtrain, dvalid = dataset.split(task_type=TaskType.regression)
+    dataset = RektDataset(data=classificatation_data, label=classification_label)
+    dtrain, dvalid = dataset.split(task_type=TaskType.multiclass)
     assert isinstance(dtrain, RektDataset)
     assert isinstance(dvalid, RektDataset)
 

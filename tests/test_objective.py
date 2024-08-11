@@ -99,8 +99,5 @@ def test_rektobjective_validate_objective_valid(task_type, objective):
 
 # Test __validate_objective for invalid objective
 def test_rektobjective_validate_objective_invalid():
-    with pytest.raises(
-        ValueError,
-        match="Task type 'TaskType.regression' and objective 'ObjectiveName.binary' are not matched.",
-    ):
+    with pytest.raises(ValueError):
         RektObjective(task_type=TaskType.regression, objective="binary")

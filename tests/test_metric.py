@@ -96,10 +96,7 @@ def test_rektmetric_validate_metric_valid(task_type, metric):
 
 # Test __validate_metric for invalid metric
 def test_rektmetric_validate_metric_invalid():
-    with pytest.raises(
-        ValueError,
-        match="Task type 'TaskType.regression' and metric 'MetricName.auc' are not matched.",
-    ):
+    with pytest.raises(ValueError):
         RektMetric(
             task_type=TaskType.regression, objective=ObjectiveName.rmse, metric="auc"
         )

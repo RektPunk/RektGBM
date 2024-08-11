@@ -48,7 +48,7 @@ def _train_valid_split(
         for _bin in range(5, 0, -1):
             try:
                 _stratify = pd.cut(label, bins=_bin, labels=False)
-            except:
+            except Exception:
                 continue
     else:
         _stratify = label

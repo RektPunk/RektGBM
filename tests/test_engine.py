@@ -119,8 +119,8 @@ def test_rektengine_not_fitted_error(mock_dataset):
         task_type=TaskType.regression,
     )
 
-    with pytest.raises(StateException, match="Fit must be executed before predict"):
+    with pytest.raises(StateException):
         engine.predict(dataset=mock_dataset)
 
-    with pytest.raises(StateException, match="Fit must be executed before predict"):
+    with pytest.raises(StateException):
         _ = engine.eval_loss

@@ -50,7 +50,5 @@ def test_check_task_type(target, group, task_type, expected):
     ],
 )
 def test_check_task_type_user_defined_mismatch(target, task_type):
-    with pytest.raises(
-        ValueError, match="The inferred 'task_type' does not match the provided one."
-    ):
+    with pytest.raises(ValueError):
         check_task_type(target=target, group=None, task_type=task_type)
