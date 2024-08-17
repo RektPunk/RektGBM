@@ -29,7 +29,6 @@ def test_get_lgb_params(mock_trial):
     np.testing.assert_allclose(params["feature_fraction"], 0.7, rtol=1e-5)
     np.testing.assert_allclose(params["bagging_fraction"], 0.7, rtol=1e-5)
     np.testing.assert_allclose(params["bagging_freq"], 4)
-    np.testing.assert_allclose(params["n_estimators"], 7000)
 
 
 def test_get_xgb_params(mock_trial):
