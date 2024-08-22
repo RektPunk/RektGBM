@@ -11,14 +11,30 @@ from rektgbm import RektDataset, RektGBM, RektOptimizer
 logging.basicConfig(level=logging.INFO)
 
 
+CSV: str = ".csv"
+PARQUET: str = ".parquet"
+UNSUPPORTED_FILE_ERROR: ValueError = ValueError(
+    "Unsupported file format. Please provide a CSV or Parquet file."
+)
+
+
 def read_data(file_path: str) -> pd.DataFrame:
-    if file_path.endswith(".csv"):
+    if file_path.endswith(CSV):
         return pd.read_csv(file_path)
+    elif file_path.endswith(PARQUET):
+        return pd.read_parquet(file_path)
+    else:
+        raise UNSUPPORTED_FILE_ERROR
 
 
 def save_data(preds: np.ndarray, file_path: str) -> None:
-    if file_path.endswith(".csv"):
-        pd.DataFrame(preds, columns=["predict"]).to_csv(file_path, index=False)
+    _predict: str = "predict"
+    if file_path.endswith(CSV):
+        pd.DataFrame(preds, columns=[_predict]).to_csv(file_path, index=False)
+    elif file_path.endswith(PARQUET):
+        pd.DataFrame(preds, columns=[_predict]).to_parquet(file_path, index=False)
+    else:
+        raise UNSUPPORTED_FILE_ERROR
 
 
 def main(
@@ -33,15 +49,20 @@ def main(
         int, typer.Argument(help="Number of optimization trials.")
     ] = 100,
 ) -> None:
+    _supported_type = (CSV, PARQUET)
     if (
-        not data_path.endswith(".csv")
-        or not test_data_path.endswith(".csv")
-        or not result_path.endswith(".csv")
+        not data_path.endswith(_supported_type)
+        or not test_data_path.endswith(_supported_type)
+        or not result_path.endswith(_supported_type)
     ):
-        raise ValueError("Unsupported file format. Please provide a CSV file.")
+        raise UNSUPPORTED_FILE_ERROR
 
     train_data = read_data(data_path)
     test_data = read_data(test_data_path)
+    if target not in train_data.columns:
+        raise ValueError(
+            f"The specified target column '{target}' does not exist in the training data."
+        )
     train_label = train_data.pop(target)
     dtrain = RektDataset(data=train_data, label=train_label)
     dtest = RektDataset(data=test_data)
