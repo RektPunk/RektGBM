@@ -21,6 +21,8 @@ lightgbm = "^4.5.0"
 xgboost = "^2.1.1"
 optuna = "^3.6.1"
 typer = "^0.12.3"
+pyarrow = "^17.0.0"
+fastparquet = "^2024.5.0"
 
 
 [tool.poetry.group.dev.dependencies]
