@@ -46,9 +46,9 @@ Usage: rektgbm [OPTIONS] DATA_PATH TEST_DATA_PATH TARGET [RESULT_PATH] [N_TRIALS
 │      result_path      [RESULT_PATH]  Path to the prediction results. [default: predict.csv]
 │      n_trials         [N_TRIALS]     Number of optimization trials. [default: 100]
 ╰───────────────────────────────────────────────────────────────────────────────────────────────╯
-╭─ Options ─────────────────────────────────────────────────────────────────────────────────────────╮
+╭─ Options ─────────────────────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.
-╰───────────────────────────────────────────────────────────────────────────────────────────────────╯
+╰───────────────────────────────────────────────────────────────────────────────────────────────╯
 
 $ rektgbm train.csv test.csv target predict.csv 100
 ```
