@@ -39,13 +39,13 @@ Here’s a quick example to showcase how you can use RektGBM in your machine lea
 ```bash
 $ rektgbm --help
 Usage: rektgbm [OPTIONS] DATA_PATH TEST_DATA_PATH TARGET [RESULT_PATH] [N_TRIALS]
-╭─ Arguments ───────────────────────────────────────────────────────────────────────────────────────╮
-│ *    data_path           TEXT           Path to the training data file.  [required]
-│ *    test_data_path      TEXT           Path to the test data file.  [required]
-│ *    target              TEXT           Name of the target column.  [required]
-│      result_path         [RESULT_PATH]  Path to the prediction results. [default: predict.csv]
-│      n_trials            [N_TRIALS]     Number of optimization trials. [default: 100]
-╰───────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Arguments ───────────────────────────────────────────────────────────────────────────────────╮
+│ *    data_path        TEXT           Path to the training data file.  [required]
+│ *    test_data_path   TEXT           Path to the test data file.  [required]
+│ *    target           TEXT           Name of the target column.  [required]
+│      result_path      [RESULT_PATH]  Path to the prediction results. [default: predict.csv]
+│      n_trials         [N_TRIALS]     Number of optimization trials. [default: 100]
+╰───────────────────────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ─────────────────────────────────────────────────────────────────────────────────────────╮
 │ --help          Show this message and exit.
 ╰───────────────────────────────────────────────────────────────────────────────────────────────────╯
