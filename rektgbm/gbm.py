@@ -1,8 +1,6 @@
-from typing import Any, Dict, Optional
-
 import numpy as np
 
-from rektgbm.base import BaseGBM, MethodName
+from rektgbm.base import BaseGBM, MethodName, ParamsLike
 from rektgbm.dataset import RektDataset
 from rektgbm.engine import RektEngine
 from rektgbm.metric import RektMetric
@@ -14,10 +12,10 @@ class RektGBM(BaseGBM):
     def __init__(
         self,
         method: str,
-        params: Dict[str, Any],
-        task_type: Optional[str] = None,
-        objective: Optional[str] = None,
-        metric: Optional[str] = None,
+        params: ParamsLike,
+        task_type: str | None = None,
+        objective: str | None = None,
+        metric: str | None = None,
     ):
         self.method = MethodName.get(method)
         self.params = params
@@ -28,7 +26,7 @@ class RektGBM(BaseGBM):
     def fit(
         self,
         dataset: RektDataset,
-        valid_set: Optional[RektDataset] = None,
+        valid_set: RektDataset | None = None,
     ):
         self._task_type = check_task_type(
             target=dataset.label,
