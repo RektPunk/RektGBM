@@ -43,6 +43,7 @@ YdataLike = pd.Series | np.ndarray
 ModelLike = lgb.basic.Booster | xgb.Booster
 DataLike = lgb.basic.Dataset | xgb.DMatrix
 DataFuncLike = Callable[[XdataLike, YdataLike | None], DataLike | XdataLike]
+ParamsLike = dict[str, float | int | str | bool]
 
 
 class StateException(Exception):
