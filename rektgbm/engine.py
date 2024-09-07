@@ -1,10 +1,8 @@
-from typing import Any, Dict, Optional
-
 import lightgbm as lgb
 import numpy as np
 import xgboost as xgb
 
-from rektgbm.base import BaseGBM, MethodName, StateException
+from rektgbm.base import BaseGBM, MethodName, ParamsLike, StateException
 from rektgbm.dataset import RektDataset
 from rektgbm.metric import METRIC_DICT_KEY_MAPPER, LgbMetricName
 from rektgbm.task import TaskType
@@ -16,7 +14,7 @@ class RektEngine(BaseGBM):
     def __init__(
         self,
         method: MethodName,
-        params: Dict[str, Any],
+        params: ParamsLike,
         task_type: TaskType,
     ) -> None:
         self.method = method
@@ -26,7 +24,7 @@ class RektEngine(BaseGBM):
     def fit(
         self,
         dataset: RektDataset,
-        valid_set: Optional[RektDataset],
+        valid_set: RektDataset | None,
     ) -> None:
         if valid_set is None:
             dtrain, dvalid = dataset.dsplit(
