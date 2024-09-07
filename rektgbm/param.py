@@ -1,13 +1,11 @@
-from typing import Any, Dict, Optional, Union
-
 from optuna import Trial
 
-from rektgbm.base import MethodName
+from rektgbm.base import MethodName, ParamsLike
 from rektgbm.metric import MetricName
 from rektgbm.objective import ObjectiveName
 
 
-def get_lgb_params(trial: Trial) -> Dict[str, Union[float, int]]:
+def get_lgb_params(trial: Trial) -> ParamsLike:
     # https://lightgbm.readthedocs.io/en/latest/Parameters.html#learning-control-parameters
     return {
         "verbosity": -1,
@@ -22,7 +20,7 @@ def get_lgb_params(trial: Trial) -> Dict[str, Union[float, int]]:
     }
 
 
-def get_xgb_params(trial: Trial) -> Dict[str, Union[float, int]]:
+def get_xgb_params(trial: Trial) -> ParamsLike:
     # https://xgboost.readthedocs.io/en/stable/parameter.html#parameters-for-tree-booster
     return {
         "verbosity": 0,
@@ -43,12 +41,12 @@ METHOD_PARAMS_MAPPER = {
 
 
 def set_additional_params(
-    params: Dict[str, Any],
+    params: ParamsLike,
     objective: ObjectiveName,
     metric: str,
     method: MethodName,
-    num_class: Optional[int],
-) -> Dict[str, Any]:
+    num_class: int | None,
+) -> ParamsLike:
     _params = params.copy()
     if objective == ObjectiveName.quantile:
         if method == MethodName.lightgbm and "quantile_alpha" in _params.keys():
