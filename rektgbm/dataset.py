@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Dict, Optional, Tuple, Union
 
 import lightgbm as lgb
 import numpy as np
@@ -24,7 +23,7 @@ class _TypeName(BaseEnum):
     predict_dtype: int = 2
 
 
-_METHOD_FUNC_TYPE_MAPPER: Dict[MethodName, Dict[_TypeName, DataFuncLike]] = {
+_METHOD_FUNC_TYPE_MAPPER: dict[MethodName, dict[_TypeName, DataFuncLike]] = {
     MethodName.lightgbm: {
         _TypeName.train_dtype: lgb.Dataset,
         _TypeName.predict_dtype: lambda data: data,
@@ -43,7 +42,7 @@ def _get_dtype(method: MethodName, dtype: _TypeName):
 
 def _train_valid_split(
     data: XdataLike, label: YdataLike, task_type: TaskType
-) -> Tuple[XdataLike, XdataLike, YdataLike, YdataLike]:
+) -> tuple[XdataLike, XdataLike, YdataLike, YdataLike]:
     if task_type == TaskType.regression:
         for _bin in range(5, 0, -1):
             try:
@@ -60,9 +59,9 @@ def _train_valid_split(
 @dataclass
 class RektDataset:
     data: XdataLike
-    label: Optional[YdataLike] = None
-    group: Optional[YdataLike] = None
-    reference: Optional["RektDataset"] = None
+    label: YdataLike | None = None
+    group: YdataLike | None = None
+    reference: "RektDataset" | None = None
     skip_post_init: bool = False
 
     def __post_init__(self) -> None:
@@ -74,7 +73,7 @@ class RektDataset:
             self.data = pd.DataFrame(self.data)
 
         if self.reference is None:
-            self.encoders: Dict[str, RektLabelEncoder] = {}
+            self.encoders: dict[str, RektLabelEncoder] = {}
             for col in self.data.columns:
                 if self.data[col].dtype == "object":
                     _encoder = RektLabelEncoder()
@@ -103,14 +102,14 @@ class RektDataset:
         )
         return train_dtype(data=self.data, label=self.label, group=self.group)
 
-    def dpredict(self, method: MethodName) -> Union[DataLike, XdataLike]:
+    def dpredict(self, method: MethodName) -> DataLike | XdataLike:
         predict_dtype = _get_dtype(
             method=method,
             dtype=_TypeName.predict_dtype,
         )
         return predict_dtype(data=self.data)
 
-    def split(self, task_type: TaskType) -> Tuple["RektDataset", "RektDataset"]:
+    def split(self, task_type: TaskType) -> tuple["RektDataset", "RektDataset"]:
         self.__check_label_available()
         train_data, valid_data, train_label, valid_label = _train_valid_split(
             data=self.data,
@@ -123,7 +122,7 @@ class RektDataset:
 
     def dsplit(
         self, method: MethodName, task_type: TaskType
-    ) -> Tuple[DataLike, DataLike]:
+    ) -> tuple[DataLike, DataLike]:
         self.__check_label_available()
         train_data, valid_data, train_label, valid_label = _train_valid_split(
             data=self.data,
