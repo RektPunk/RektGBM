@@ -1,8 +1,8 @@
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Callable
 
 import optuna
 
-from rektgbm.base import BaseEnum, MethodName, StateException
+from rektgbm.base import BaseEnum, MethodName, ParamsLike, StateException
 from rektgbm.dataset import RektDataset
 from rektgbm.engine import RektEngine
 from rektgbm.metric import RektMetric
@@ -21,11 +21,11 @@ class RektOptimizer:
     def __init__(
         self,
         method: str = "both",
-        task_type: Optional[str] = None,
-        objective: Optional[str] = None,
-        metric: Optional[str] = None,
-        params: Optional[Union[List[Callable], Callable]] = None,
-        additional_params: Dict[str, Any] = {},
+        task_type: str | None = None,
+        objective: str | None = None,
+        metric: str | None = None,
+        params: list[Callable] | Callable | None = None,
+        additional_params: ParamsLike = {},
     ) -> None:
         if _RektMethods.both == _RektMethods.get(method):
             self.method = [MethodName.lightgbm, MethodName.xgboost]
@@ -50,8 +50,8 @@ class RektOptimizer:
         self,
         dataset: RektDataset,
         n_trials: int,
-        valid_set: Optional[RektDataset] = None,
-    ) -> Dict[str, Any]:
+        valid_set: RektDataset | None = None,
+    ) -> None:
         self._task_type: TaskType = check_task_type(
             target=dataset.label,
             group=dataset.group,
@@ -85,7 +85,7 @@ class RektOptimizer:
             if self.__is_label_encoder_used:
                 valid_set.transform_label(label_encoder=_label_encoder)
 
-        self.studies: Dict[MethodName, optuna.Study] = {}
+        self.studies: dict[MethodName, optuna.Study] = {}
         for method, param in zip(self.method, self.params):
             _addtional_params = set_additional_params(
                 objective=self.rekt_objective.objective,
@@ -119,7 +119,7 @@ class RektOptimizer:
         self._is_optimized = True
 
     @property
-    def best_params(self) -> Dict[str, Any]:
+    def best_params(self) -> dict[str, str | int | float | ParamsLike | None]:
         self.__check_optimized()
         best_method = min(self.studies, key=lambda k: self.studies[k].best_value)
         best_study = self.studies.get(best_method)

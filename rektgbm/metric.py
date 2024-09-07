@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Dict, List, Optional
 
 from rektgbm.base import BaseEnum, MethodName
 from rektgbm.objective import ObjectiveName
@@ -73,7 +72,7 @@ class LgbMetricName(BaseEnum):
     kullback_leibler: str = "kullback_leibler"
 
 
-TASK_METRIC_MAPPER: Dict[TaskType, List[MetricName]] = {
+TASK_METRIC_MAPPER: dict[TaskType, list[MetricName]] = {
     TaskType.regression: [
         MetricName.rmse,
         MetricName.mae,
@@ -97,7 +96,7 @@ TASK_METRIC_MAPPER: Dict[TaskType, List[MetricName]] = {
 }
 
 
-OBJECTIVE_METRIC_MAPPER: Dict[ObjectiveName, MetricName] = {
+OBJECTIVE_METRIC_MAPPER: dict[ObjectiveName, MetricName] = {
     ObjectiveName.rmse: MetricName.rmse,
     ObjectiveName.mae: MetricName.mae,
     ObjectiveName.huber: MetricName.huber,
@@ -110,12 +109,12 @@ OBJECTIVE_METRIC_MAPPER: Dict[ObjectiveName, MetricName] = {
 }
 
 
-METRIC_DICT_KEY_MAPPER: Dict[MethodName, str] = {
+METRIC_DICT_KEY_MAPPER: dict[MethodName, str] = {
     MethodName.lightgbm: "metric",
     MethodName.xgboost: "eval_metric",
 }
 
-METRIC_ENGINE_MAPPER: Dict[MetricName, Dict[MethodName, str]] = {
+METRIC_ENGINE_MAPPER: dict[MetricName, dict[MethodName, str]] = {
     MetricName.rmse: {
         MethodName.lightgbm: LgbMetricName.rmse.value,
         MethodName.xgboost: XgbMetricName.rmse.value,
@@ -171,7 +170,7 @@ METRIC_ENGINE_MAPPER: Dict[MetricName, Dict[MethodName, str]] = {
 class RektMetric:
     task_type: TaskType
     objective: ObjectiveName
-    metric: Optional[str]
+    metric: str | None
 
     def __post_init__(self) -> None:
         if self.metric:
@@ -185,7 +184,7 @@ class RektMetric:
     def get_metric_str(self, method: MethodName) -> str:
         return self._metric_engine_mapper.get(method)
 
-    def get_metric_dict(self, method: MethodName) -> Dict[str, str]:
+    def get_metric_dict(self, method: MethodName) -> dict[str, str]:
         return {METRIC_DICT_KEY_MAPPER.get(method): self.get_metric_str(method=method)}
 
     def __validate_metric(self) -> None:

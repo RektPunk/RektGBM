@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Callable, Optional, Union
+from typing import Callable
 
 import lightgbm as lgb
 import numpy as np
@@ -38,11 +38,12 @@ class MethodName(BaseEnum):
     xgboost: str = "xgboost"
 
 
-XdataLike = Union[pd.DataFrame, pd.Series, np.ndarray]
-YdataLike = Union[pd.Series, np.ndarray]
-ModelLike = Union[lgb.basic.Booster, xgb.Booster]
-DataLike = Union[lgb.basic.Dataset, xgb.DMatrix]
-DataFuncLike = Callable[[XdataLike, Optional[YdataLike]], Union[DataLike, XdataLike]]
+XdataLike = pd.DataFrame | pd.Series | np.ndarray
+YdataLike = pd.Series | np.ndarray
+ModelLike = lgb.basic.Booster | xgb.Booster
+DataLike = lgb.basic.Dataset | xgb.DMatrix
+DataFuncLike = Callable[[XdataLike, YdataLike | None], DataLike | XdataLike]
+ParamsLike = dict[str, float | int | str | bool]
 
 
 class StateException(Exception):

@@ -1,5 +1,3 @@
-from typing import Dict, List, Optional
-
 from sklearn.utils.multiclass import type_of_target
 
 from rektgbm.base import BaseEnum, YdataLike
@@ -18,7 +16,7 @@ class SklearnTaskType(BaseEnum):
     multiclass: int = 3
 
 
-SKLEARN_TASK_TYPE_MAPPER: Dict[SklearnTaskType, List[TaskType]] = {
+SKLEARN_TASK_TYPE_MAPPER: dict[SklearnTaskType, list[TaskType]] = {
     SklearnTaskType.continuous: [TaskType.regression],
     SklearnTaskType.binary: [TaskType.binary],
     SklearnTaskType.multiclass: [TaskType.multiclass, TaskType.rank],
@@ -27,8 +25,8 @@ SKLEARN_TASK_TYPE_MAPPER: Dict[SklearnTaskType, List[TaskType]] = {
 
 def check_task_type(
     target: YdataLike,
-    group: Optional[YdataLike],
-    task_type: Optional[str],
+    group: YdataLike | None,
+    task_type: str | None,
 ) -> TaskType:
     if group is not None:
         return TaskType.rank

@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Dict, List, Optional
 
 from rektgbm.base import BaseEnum, MethodName
 from rektgbm.task import TaskType
@@ -59,7 +58,7 @@ class LgbObjectiveName(BaseEnum):
     rank_xendcg: str = "rank_xendcg"
 
 
-TASK_OBJECTIVE_MAPPER: Dict[TaskType, List[ObjectiveName]] = {
+TASK_OBJECTIVE_MAPPER: dict[TaskType, list[ObjectiveName]] = {
     TaskType.regression: [
         ObjectiveName.rmse,
         ObjectiveName.mae,
@@ -80,7 +79,7 @@ TASK_OBJECTIVE_MAPPER: Dict[TaskType, List[ObjectiveName]] = {
 }
 
 
-OBJECTIVE_ENGINE_MAPPER: Dict[ObjectiveName, Dict[MethodName, str]] = {
+OBJECTIVE_ENGINE_MAPPER: dict[ObjectiveName, dict[MethodName, str]] = {
     ObjectiveName.rmse: {
         MethodName.lightgbm: LgbObjectiveName.rmse.value,
         MethodName.xgboost: XgbObjectiveName.squarederror.value,
@@ -123,7 +122,7 @@ OBJECTIVE_ENGINE_MAPPER: Dict[ObjectiveName, Dict[MethodName, str]] = {
 @dataclass
 class RektObjective:
     task_type: TaskType
-    objective: Optional[str]
+    objective: str | None
 
     def __post_init__(self) -> None:
         if self.objective:
@@ -138,7 +137,7 @@ class RektObjective:
     def get_objective_str(self, method: MethodName) -> str:
         return self._objective_engine_mapper.get(method)
 
-    def get_objective_dict(self, method: MethodName) -> Dict[str, str]:
+    def get_objective_dict(self, method: MethodName) -> dict[str, str]:
         return {OBJECTIVE_DICT_KEY: self.get_objective_str(method=method)}
 
     def __validate_objective(self) -> None:
