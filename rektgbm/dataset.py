@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 
 import lightgbm as lgb
 import numpy as np
@@ -61,7 +62,7 @@ class RektDataset:
     data: XdataLike
     label: YdataLike | None = None
     group: YdataLike | None = None
-    reference: "RektDataset" | None = None
+    reference: Optional["RektDataset"] = None
     skip_post_init: bool = False
 
     def __post_init__(self) -> None:
