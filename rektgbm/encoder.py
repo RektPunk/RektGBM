@@ -34,5 +34,5 @@ class RektLabelEncoder(object):
         self.fit_label(series=series)
         return self.transform_label(series=series)
 
-    def inverse_transform(self, series: XdataLike) -> XdataLike:
+    def inverse_transform(self, series: YdataLike) -> YdataLike:
         return self.label_encoder.inverse_transform(y=series)

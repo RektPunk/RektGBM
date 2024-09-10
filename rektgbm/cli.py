@@ -46,7 +46,7 @@ def main(
         typer.Argument(help="Path to save the prediction results."),
     ] = "predict.csv",
     n_trials: Annotated[
-        int, typer.Argument(help="Number of optimization trials.")
+        int, typer.Argument(help="Number of optimization trials per model.")
     ] = 100,
 ) -> None:
     _supported_type = (CSV, PARQUET)
