@@ -6,14 +6,17 @@
   <a href="https://github.com/RektPunk/RektGBM/releases/latest">
     <img alt="Release" src="https://img.shields.io/github/v/release/RektPunk/rektgbm.svg">
   </a>
-  <a href="https://github.com/RektPunk/RektGBM/blob/main/LICENSE">
-    <img alt="License" src="https://img.shields.io/github/license/RektPunk/RektGBM.svg">
-  </a>
   <a href="https://pypi.org/project/rektgbm">
     <img alt="Pythonv" src="https://img.shields.io/pypi/pyversions/rektgbm.svg?logo=python&logoColor=white">
   </a>
+  <a href="https://github.com/RektPunk/RektGBM/blob/main/LICENSE">
+    <img alt="License" src="https://img.shields.io/github/license/RektPunk/RektGBM.svg">
+  </a>
   <a href="https://github.com/RektPunk/RektGBM/actions/workflows/lint.yaml">
     <img alt="Lint" src="https://github.com/RektPunk/RektGBM/actions/workflows/lint.yaml/badge.svg?branch=main">
+  </a>
+  <a href="https://github.com/RektPunk/RektGBM/actions/workflows/test.yaml">
+    <img alt="Test" src="https://github.com/RektPunk/RektGBM/actions/workflows/test.yaml/badge.svg?branch=main">
   </a>
 </p>
 
