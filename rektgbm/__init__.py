@@ -1,4 +1,4 @@
-# flake8: noqa
+# ruff: noqa
 from rektgbm.dataset import RektDataset
 from rektgbm.gbm import RektGBM
 from rektgbm.optimizer import RektOptimizer
