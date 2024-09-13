@@ -67,9 +67,8 @@ class RektGBM(BaseGBM):
         if self._task_type in {TaskType.binary, TaskType.regression, TaskType.rank}:
             return preds
 
-        if self._task_type == TaskType.multiclass:
-            if self.method == MethodName.lightgbm:
-                preds = np.argmax(preds, axis=1).astype(int)
-            else:
-                preds = np.around(preds).astype(int)
-            return self.label_encoder.inverse_transform(series=preds)
+        if self.method == MethodName.lightgbm:
+            preds = np.argmax(preds, axis=1).astype(int)
+        else:
+            preds = np.around(preds).astype(int)
+        return self.label_encoder.inverse_transform(series=preds)
