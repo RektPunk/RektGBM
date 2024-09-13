@@ -49,7 +49,7 @@ class RektGBM(BaseGBM):
         )
         if self._task_type in {TaskType.binary, TaskType.multiclass, TaskType.rank}:
             self.label_encoder = dataset.fit_transform_label()
-            self._label_encoder_used = True
+            self._is_label_encoder_used = True
 
         if valid_set is not None and self.__is_label_encoder_used:
             valid_set.transform_label(label_encoder=self.label_encoder)
@@ -66,12 +66,8 @@ class RektGBM(BaseGBM):
 
     def predict(self, dataset: RektDataset):
         preds = self.engine.predict(dataset=dataset)
-
-        if self._task_type in {TaskType.regression, TaskType.rank}:
+        if self._task_type in {TaskType.binary, TaskType.regression, TaskType.rank}:
             return preds
-
-        if self._task_type == TaskType.binary:
-            preds = np.around(preds).astype(int)
 
         if self._task_type == TaskType.multiclass:
             if self.method == MethodName.lightgbm:
@@ -81,9 +77,8 @@ class RektGBM(BaseGBM):
 
         if self.__is_label_encoder_used:
             preds = self.label_encoder.inverse_transform(series=preds)
-
         return preds
 
     @property
     def __is_label_encoder_used(self) -> bool:
-        return getattr(self, "_label_encoder_used", False)
+        return getattr(self, "_is_label_encoder_used", False)
