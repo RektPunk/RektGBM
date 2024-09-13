@@ -5,6 +5,7 @@ import pytest
 
 from rektgbm.base import MethodName
 from rektgbm.dataset import RektDataset
+from rektgbm.encoder import RektLabelEncoder
 from rektgbm.engine import RektEngine
 from rektgbm.gbm import RektGBM
 from rektgbm.task import TaskType
@@ -90,6 +91,8 @@ def test_rektgbm_predict_multiclass(mock_dataset, mock_engine):
     gbm.engine = mock_engine
     gbm._task_type = TaskType.multiclass
     gbm._is_fitted = True
+    gbm.label_encoder = RektLabelEncoder()
+    gbm.label_encoder.fit_label([0, 1, 2])
 
     mock_engine.predict.return_value = np.array(
         [[0.1, 0.7, 0.2], [0.3, 0.4, 0.3], [0.2, 0.2, 0.6]]
