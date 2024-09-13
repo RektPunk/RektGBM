@@ -76,7 +76,7 @@ def test_rektgbm_predict_binary(mock_dataset, mock_engine):
     gbm._is_fitted = True
 
     preds = gbm.predict(dataset=mock_dataset)
-    np.testing.assert_allclose(preds, [0, 1, 0, 1], rtol=1e-5)
+    np.testing.assert_allclose(preds, [0.1, 0.9, 0.2, 0.8], rtol=1e-5)
 
 
 def test_rektgbm_predict_multiclass(mock_dataset, mock_engine):
