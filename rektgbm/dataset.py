@@ -89,7 +89,7 @@ class RektDataset:
             return self.label_encoder
         self.label_encoder = RektLabelEncoder()
         self.label = self.label_encoder.fit_transform_label(series=self.label)
-        self._is_transformed = True
+        self._is_label_transformed = True
         return self.label_encoder
 
     def transform_label(self, label_encoder: RektLabelEncoder) -> None:
@@ -152,4 +152,4 @@ class RektDataset:
 
     @property
     def __is_label_transformed(self) -> bool:
-        return getattr(self, "_is_transformed", False)
+        return getattr(self, "_is_label_transformed", False)
