@@ -38,7 +38,7 @@ def test_rektdataset_fit_transform_label():
     dataset = RektDataset(data=classificatation_data, label=classification_label)
     label_encoder = dataset.fit_transform_label()
     assert isinstance(label_encoder, RektLabelEncoder)
-    assert dataset._is_transformed is True
+    assert dataset._is_label_transformed is True
 
 
 # Test transform_label
