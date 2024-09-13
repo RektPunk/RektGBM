@@ -18,7 +18,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 # Create RektDataset objects for training and testing data
 dtrain = RektDataset(data=X_train, label=y_train)
-dtest = RektDataset(data=X_test, label=y_test)
+dtest = RektDataset(data=X_test, label=y_test, reference=dtrain)
 
 # Initialize RektOptimizer with specified settings for regression task
 rekt_optimizer = RektOptimizer(

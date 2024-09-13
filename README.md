@@ -67,7 +67,7 @@ X_test = pd.read_csv("test.csv")
 y_train = X_train.pop("target")
 
 dtrain = RektDataset(data=X_train, label=y_train)
-dtest = RektDataset(data=X_test)
+dtest = RektDataset(data=X_test, reference=dtrain)
 
 # Initialize RektOptimizer to automatically detect task type, objective, and metric
 rekt_optimizer = RektOptimizer()

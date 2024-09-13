@@ -65,7 +65,7 @@ def main(
         )
     train_label = train_data.pop(target)
     dtrain = RektDataset(data=train_data, label=train_label)
-    dtest = RektDataset(data=test_data)
+    dtest = RektDataset(data=test_data, reference=dtrain)
     rekt_optimizer = RektOptimizer()
 
     rekt_optimizer.optimize_params(dataset=dtrain, n_trials=n_trials)
