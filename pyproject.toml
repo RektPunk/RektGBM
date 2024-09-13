@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "rektgbm"
-version = "0.1.3"
+version = "0.1.4"
 description = "No-brainer machine learning solution to achieve satisfactory performance"
 authors = ["RektPunk <rektpunk@gmail.com>"]
 license = "MIT"
