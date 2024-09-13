@@ -46,7 +46,9 @@ y_validation = validation_df["relevance"]  # Validation labels (relevance scores
 # Create RektDataset objects for training and validation
 dtrain = RektDataset(data=X_train, label=y_train, group=query_ids_train)
 dvalid = RektDataset(data=X_validation, label=y_validation, group=query_ids_validation)
-dtest = RektDataset(data=X_test)  # Test dataset does not require group information
+dtest = RektDataset(
+    data=X_test, reference=dtrain
+)  # Test dataset does not require group information
 
 
 # Initialize RektOptimizer for automatic task type, objective, and metric detection

@@ -18,6 +18,16 @@ classificatation_data, classification_label = make_classification(
     n_samples=1_000, n_features=5, n_informative=3, n_classes=3
 )
 
+# Sample data
+data = pd.DataFrame(
+    {
+        "col1": ["A", "B", "A", "C"],
+        "col2": [1, 2, 1, 3],
+        "col3": ["2", "3", "3", "2"],
+    }
+)
+label = pd.Series([0, 1, 0, 1])
+
 
 # Test RektDataset __post_init__
 def test_rektdataset_post_init():
@@ -112,3 +122,62 @@ def test_rektdataset_check_label_available():
     dataset = RektDataset(data=classificatation_data)
     with pytest.raises(AttributeError):
         dataset.__check_label_available()
+
+
+def test_rektdataset_reference():
+    # Create a RektDataset without reference
+    dataset = RektDataset(data=data, label=label)
+
+    # Test that encoders are applied properly
+    assert isinstance(dataset.encoders["col1"], RektLabelEncoder)
+    assert isinstance(dataset.encoders["col3"], RektLabelEncoder)
+
+    # Check that columns are encoded correctly
+    transformed_data = pd.DataFrame(
+        {
+            "col1": [0, 1, 0, 2],
+            "col2": [1, 2, 1, 3],
+            "col3": [0, 1, 1, 0],
+        }
+    )
+    pd.testing.assert_frame_equal(dataset.data, transformed_data)
+
+    # Create a new dataset using the reference
+    new_data = pd.DataFrame(
+        {
+            "col1": ["A", "C", "B"],
+            "col2": [1, 3, 2],
+            "col3": ["X", "Y", "X"],
+        }
+    )
+
+    new_dataset = RektDataset(data=new_data, reference=dataset)
+
+    # The new dataset should apply the same encoders as the reference
+    transformed_new_data = pd.DataFrame(
+        {
+            "col1": [0, 2, 1],
+            "col2": [1, 3, 2],
+            "col3": [3, 3, 3],
+        }
+    )
+    print(new_dataset.data)
+    pd.testing.assert_frame_equal(new_dataset.data, transformed_new_data)
+
+    # The encoders in the new dataset should be the same as those in the reference
+    assert new_dataset.encoders == dataset.encoders
+
+
+def test_rektdataset_reference_with_missing_columns():
+    # Create a reference dataset with one column missing in the new dataset
+    dataset = RektDataset(data=data, label=label)
+
+    new_data = pd.DataFrame(
+        {
+            "col1": ["A", "C"],
+            "col2": [1, 3],  # col3 is missing
+        }
+    )
+
+    with pytest.raises(ValueError):
+        RektDataset(data=new_data, reference=dataset)
