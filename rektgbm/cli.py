@@ -63,6 +63,10 @@ def main(
         raise ValueError(
             f"The specified target column '{target}' does not exist in the training data."
         )
+
+    if target in test_data.columns:
+        test_data.pop(target)
+
     train_label = train_data.pop(target)
     dtrain = RektDataset(data=train_data, label=train_label)
     dtest = RektDataset(data=test_data, reference=dtrain)
