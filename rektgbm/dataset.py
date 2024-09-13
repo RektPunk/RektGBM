@@ -57,6 +57,14 @@ def _train_valid_split(
     )
 
 
+def _compare_datasets(data: pd.DataFrame, reference_data: pd.DataFrame) -> None:
+    if data.shape[1] != reference_data.shape[1]:
+        raise ValueError("Number of columns do not match")
+
+    if not set(data.columns) == set(reference_data.columns):
+        raise ValueError("Column names do not match")
+
+
 @dataclass
 class RektDataset:
     data: XdataLike
@@ -81,7 +89,9 @@ class RektDataset:
                     self.data[col] = _encoder.fit_transform(self.data[col])
                     self.encoders.update({col: _encoder})
         else:
-            for col, _encoder in self.reference.encoders.items():
+            _compare_datasets(self.data, self.reference.data)
+            self.encoders = self.reference.encoders
+            for col, _encoder in self.encoders.items():
                 self.data[col] = _encoder.transform(self.data[col])
 
     def fit_transform_label(self) -> RektLabelEncoder:
