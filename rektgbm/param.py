@@ -48,24 +48,43 @@ def set_additional_params(
     num_class: int | None,
 ) -> ParamsLike:
     _params = params.copy()
-    if objective == ObjectiveName.quantile:
-        if method == MethodName.lightgbm and "quantile_alpha" in _params.keys():
-            _params["alpha"] = _params.pop("quantile_alpha")
-        elif method == MethodName.xgboost and "alpha" in _params.keys():
-            _params["quantile_alpha"] = _params.pop("alpha")
-    elif objective == ObjectiveName.huber:
-        if method == MethodName.lightgbm and "huber_slope" in _params.keys():
-            _params["alpha"] = _params.pop("quantile_alpha")
-        elif method == MethodName.xgboost and "alpha" in _params.keys():
-            _params["huber_slope"] = _params.pop("alpha")
-    elif objective == ObjectiveName.multiclass:
-        _params["num_class"] = num_class
+
+    def _handle_quantile_params():
+        if method == MethodName.lightgbm:
+            _params["alpha"] = _params.pop("quantile_alpha", _params.get("alpha"))
+        elif method == MethodName.xgboost:
+            _params["quantile_alpha"] = _params.pop(
+                "alpha", _params.get("quantile_alpha")
+            )
+
+    def _handle_huber_params():
+        if method == MethodName.lightgbm:
+            _params["alpha"] = _params.pop("quantile_alpha", _params.get("alpha"))
+        elif method == MethodName.xgboost:
+            _params["huber_slope"] = _params.pop("alpha", _params.get("huber_slope"))
+
+    def _handle_multiclass_params():
+        if num_class is not None:
+            _params["num_class"] = num_class
+
+    def _handle_rank_metric_params():
+        eval_at_default = 5
+        eval_at = _params.pop("eval_at", eval_at_default)
+        if method == MethodName.xgboost:
+            _params["eval_metric"] = f"{metric}@{eval_at}"
+        elif method == MethodName.lightgbm:
+            _params["eval_at"] = eval_at
+
+    objective_handler_map = {
+        ObjectiveName.quantile: _handle_quantile_params,
+        ObjectiveName.huber: _handle_huber_params,
+        ObjectiveName.multiclass: _handle_multiclass_params,
+    }
+
+    if objective in objective_handler_map:
+        objective_handler_map[objective]()
 
     if metric in {MetricName.ndcg.value, MetricName.map.value}:
-        _eval_at_defalut: int = 5
-        _eval_at = _params.pop("eval_at", _eval_at_defalut)
-        if method == MethodName.xgboost:
-            _params["eval_metric"] = f"{metric}@{_eval_at}"
-        elif method == MethodName.lightgbm:
-            _params["eval_at"] = _eval_at
+        _handle_rank_metric_params()
+
     return _params
