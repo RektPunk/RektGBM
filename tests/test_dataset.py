@@ -181,3 +181,8 @@ def test_rektdataset_reference_with_missing_columns():
 
     with pytest.raises(ValueError):
         RektDataset(data=new_data, reference=dataset)
+
+
+def test_rektdataset_colnames():
+    dataset = RektDataset(data=data, label=label)
+    assert dataset.colnames == ["col1", "col2", "col3"]
