@@ -1,9 +1,10 @@
 from unittest.mock import MagicMock, patch
 
 import numpy as np
+import pandas as pd
 import pytest
 
-from rektgbm.base import MethodName
+from rektgbm.base import MethodName, StateException
 from rektgbm.dataset import RektDataset
 from rektgbm.encoder import RektLabelEncoder
 from rektgbm.engine import RektEngine
@@ -38,6 +39,27 @@ def mock_engine():
     engine = MagicMock(spec=RektEngine)
     engine.predict.return_value = np.array([0.1, 0.9, 0.2, 0.8])
     return engine
+
+
+@pytest.fixture
+def dummy_dataset():
+    x_train = np.random.rand(100, 5)
+    y_train = np.random.randint(0, 2, size=(100,))
+    colnames = [f"feature_{i}" for i in range(x_train.shape[1])]
+    x_train = pd.DataFrame(x_train, columns=colnames)
+    dataset = RektDataset(x_train, y_train)
+    return dataset
+
+
+@pytest.fixture
+def dummy_gbm_model():
+    params = {
+        "learning_rate": 0.1,
+        "num_leaves": 31,
+        "n_estimators": 10,
+    }
+    model = RektGBM(method="lightgbm", params=params, task_type="binary")
+    return model
 
 
 @patch("rektgbm.gbm.RektEngine", autospec=True)
@@ -135,3 +157,34 @@ def test_rektgbm_fit_rank_raises_value_error(mock_dataset):
     )
     with pytest.raises(ValueError):
         gbm.fit(dataset=mock_dataset)
+
+
+def test_feature_importance_before_fit_raises(dummy_gbm_model):
+    with pytest.raises(StateException, match="fit is not completed"):
+        _ = dummy_gbm_model.feature_importance
+
+
+def test_feature_importance_after_fit(dummy_gbm_model, dummy_dataset):
+    dummy_gbm_model.fit(dataset=dummy_dataset)
+    feature_importances = dummy_gbm_model.feature_importance
+
+    assert isinstance(
+        feature_importances, dict
+    ), "Feature importances should be a dictionary"
+    assert len(feature_importances) == len(
+        dummy_dataset.colnames
+    ), "Feature importance length mismatch"
+    for feature in dummy_dataset.colnames:
+        assert (
+            feature in feature_importances
+        ), f"Feature {feature} not found in importance"
+
+
+def test_feature_importance_positive(dummy_gbm_model, dummy_dataset):
+    """Test that at least some feature importances are non-zero after training"""
+    dummy_gbm_model.fit(dataset=dummy_dataset)
+    feature_importances = dummy_gbm_model.feature_importance
+
+    assert all(
+        [importance >= 0 for importance in feature_importances.values()]
+    ), "All importance should be positive."

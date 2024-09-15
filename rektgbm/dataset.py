@@ -78,8 +78,7 @@ class RektDataset:
         if self.skip_post_init:
             return
 
-        if not isinstance(self.data, pd.DataFrame):
-            self.data = pd.DataFrame(self.data)
+        self.data = pd.DataFrame(self.data.copy())
 
         if self.reference is None:
             self.encoders: dict[str, RektLabelEncoder] = {}
@@ -154,6 +153,10 @@ class RektDataset:
             return int(self.label.nunique())
         elif isinstance(self.label, np.ndarray):
             return len(np.unique(self.label))
+
+    @property
+    def colnames(self) -> list[str]:
+        return self.data.columns.to_list()
 
     def __check_label_available(self) -> None:
         """Check if the label is available, raises an exception if not."""
