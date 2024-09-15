@@ -78,7 +78,7 @@ class RektGBM(BaseGBM):
         return self.label_encoder.inverse_transform(series=preds)
 
     @cached_property
-    def feature_importance(self) -> np.ndarray:
+    def feature_importance(self) -> dict[str, float]:
         self.__check_fitted()
         importances = {str(k): 0 for k in self._colnames}
         if self.__is_lgb:
