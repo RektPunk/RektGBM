@@ -1,6 +1,8 @@
+from functools import cached_property
+
 import numpy as np
 
-from rektgbm.base import BaseGBM, MethodName, ParamsLike
+from rektgbm.base import BaseGBM, MethodName, ParamsLike, StateException
 from rektgbm.dataset import RektDataset
 from rektgbm.engine import RektEngine
 from rektgbm.metric import RektMetric
@@ -28,6 +30,7 @@ class RektGBM(BaseGBM):
         dataset: RektDataset,
         valid_set: RektDataset | None = None,
     ):
+        self._colnames = dataset.colnames
         self._task_type = check_task_type(
             target=dataset.label,
             group=dataset.group,
@@ -61,14 +64,37 @@ class RektGBM(BaseGBM):
             task_type=self._task_type,
         )
         self.engine.fit(dataset=dataset, valid_set=valid_set)
+        self._is_fitted = True
 
     def predict(self, dataset: RektDataset):
         preds = self.engine.predict(dataset=dataset)
         if self._task_type in {TaskType.binary, TaskType.regression, TaskType.rank}:
             return preds
 
-        if self.method == MethodName.lightgbm:
+        if self.__is_lgb:
             preds = np.argmax(preds, axis=1).astype(int)
         else:
             preds = np.around(preds).astype(int)
         return self.label_encoder.inverse_transform(series=preds)
+
+    @cached_property
+    def feature_importance(self) -> np.ndarray:
+        self.__check_fitted()
+        importances = {str(k): 0 for k in self._colnames}
+        if self.__is_lgb:
+            _importance = self.engine.model.feature_importance(
+                importance_type="gain"
+            ).tolist()
+            importances.update({str(k): v for k, v in zip(self._colnames, _importance)})
+            return importances
+        else:
+            importances.update(self.engine.model.get_score(importance_type="gain"))
+            return importances
+
+    @property
+    def __is_lgb(self) -> bool:
+        return self.method == MethodName.lightgbm
+
+    def __check_fitted(self):
+        if not getattr(self, "_is_fitted", False):
+            raise StateException("fit is not completed.")
