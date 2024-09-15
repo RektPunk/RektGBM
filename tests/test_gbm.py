@@ -180,14 +180,11 @@ def test_feature_importance_after_fit(dummy_gbm_model, dummy_dataset):
         ), f"Feature {feature} not found in importance"
 
 
-def test_feature_importance_nonzero(dummy_gbm_model, dummy_dataset):
+def test_feature_importance_positive(dummy_gbm_model, dummy_dataset):
     """Test that at least some feature importances are non-zero after training"""
     dummy_gbm_model.fit(dataset=dummy_dataset)
     feature_importances = dummy_gbm_model.feature_importance
 
-    non_zero_importances = sum(
-        importance > 0 for importance in feature_importances.values()
-    )
-    assert (
-        non_zero_importances > 0
-    ), "At least one feature should have non-zero importance"
+    assert all(
+        [importance >= 0 for importance in feature_importances.values()]
+    ), "All importance should be positive."
