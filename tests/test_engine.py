@@ -66,6 +66,7 @@ def test_rektengine_xgb_fit(mock_dataset, mock_xgb_model):
     xgb.train.assert_called_once_with(
         dtrain="dtrain_mock",
         verbose_eval=False,
+        num_boost_round=100,
         params={"eval_metric": "rmse"},
         evals_result={},
         evals=[("dvalid_mock", _VALID_STR)],

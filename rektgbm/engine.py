@@ -45,6 +45,7 @@ class RektEngine(BaseGBM):
             evals_result = {}
             self.model = xgb.train(
                 dtrain=dtrain,
+                num_boost_round=100,
                 verbose_eval=False,
                 params=self.params,
                 evals_result=evals_result,
