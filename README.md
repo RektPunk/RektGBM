@@ -2,24 +2,6 @@
   <img src="assets/image/logo.png" alt="logo" width=400, height=240>
 </p>
 
-<p align="center">
-  <a href="https://github.com/RektPunk/RektGBM/releases/latest">
-    <img alt="Release" src="https://img.shields.io/github/v/release/RektPunk/rektgbm.svg">
-  </a>
-  <a href="https://pypi.org/project/rektgbm">
-    <img alt="Pythonv" src="https://img.shields.io/pypi/pyversions/rektgbm.svg?logo=python&logoColor=white">
-  </a>
-  <a href="https://github.com/RektPunk/RektGBM/blob/main/LICENSE">
-    <img alt="License" src="https://img.shields.io/github/license/RektPunk/RektGBM.svg">
-  </a>
-  <a href="https://github.com/RektPunk/RektGBM/actions/workflows/lint.yaml">
-    <img alt="Lint" src="https://github.com/RektPunk/RektGBM/actions/workflows/lint.yaml/badge.svg?branch=main">
-  </a>
-  <a href="https://github.com/RektPunk/RektGBM/actions/workflows/test.yaml">
-    <img alt="Test" src="https://github.com/RektPunk/RektGBM/actions/workflows/test.yaml/badge.svg?branch=main">
-  </a>
-</p>
-
 Are you sick and tired of the endless cycle of model comparisons and hyperparameter tuning? Meet **RektGBM**, your ultimate no-brainer solution to building good enough performance machine learning models. **RektGBM** seamlessly combines [LightGBM](https://github.com/microsoft/LightGBM) and [XGBoost](https://github.com/dmlc/xgboost), two leading gradient boosting frameworks available today.
 
 **RektGBM** simplifies the complexities of model building and optimization, delivering a robust, yet easy-to-use platform that empowers you to achieve superior results without the hassle. With the integration of [Optuna](https://github.com/optuna/optuna), a cutting-edge hyperparameter optimization framework, **RektGBM** fine-tunes your models to perfection, ensuring optimal performance with minimal effort.
